@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/RobertHeim/phpbb-ext-topictags.svg?branch=master)](https://travis-ci.org/RobertHeim/phpbb-ext-topictags)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/RobertHeim/phpbb-ext-topictags/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/RobertHeim/phpbb-ext-topictags/?branch=master)
 
+This fork is for test-integration of various fixes people have worked out to get this working in phpBB 3.5 and later. It is not ready to use if this note is still present here.
+
 phpbb-ext-topictags
 ===================
 
