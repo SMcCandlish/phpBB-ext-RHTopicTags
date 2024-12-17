@@ -193,7 +193,7 @@ https://www.phpbb.com/community/viewtopic.php?f=456&t=2263616
 
 ## Credits
 
-* RobertHeim @ Github.com, for the original extension.
+* RobertHeim @ Github.com, for the original extension. RH's development of it appears to have ceased in 2020, even with regard to accepting others' pull requests (thus this fork).
 * pierrdu @ phpBB.com forum, for phpBB 3.3+ Symfony upgrade patches to routing.yml and services.yml (already integrated into RobertHeim's master branch by the time I cloned it).
 * sanekplus, thegioiluatsu, Naguissa, bonnp @ phpBB.com, for approaches to getting the Topic Tags version for phpBB 3.2 to work in 3.3+; while their changes were ultimately undone and the issue resolved a different way, what they tried was constructive in helping identify what the underlying problems were.
 * zipurman @ phpBB.com, and Dark❶ @ phpBB.com (Dark1z @ Github), for a phpBB 3.3.8+ permissions fix to main_listener.php.
