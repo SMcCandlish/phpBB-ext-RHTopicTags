@@ -3,9 +3,17 @@
 	"type": "phpbb-extension",
 	"description": "Enables tagging of topics",
 	"homepage": "https://github.com/RobertHeim/phpbb-ext-topictags",
-	"version": "3.0.0",
-	"time": "2014-05-30",
-	"keywords": ["phpbb", "extension", "topic tags", "tags", "tag", "tagging", "rh"],
+	"version": "3.0.2",
+	"time": "2024-12-17",
+	"keywords": [
+		"phpbb",
+		"extension",
+		"topic tags",
+		"tags",
+		"tag",
+		"tagging",
+		"rh"
+	],
 	"license": "GPL-2.0",
 	"authors": [
 		{
@@ -13,10 +21,16 @@
 			"homepage": "http://blog.robert-heim.de",
 			"email": "robert@robert-heim.de",
 			"role": "Lead Developer"
+		},
+		{
+			"name": "S. McCandlish",
+			"homepage": "https://github.com/SMcCandlish",
+			"role": "Patcher-upper"
 		}
 	],
 	"require": {
-		"php": ">=5.3.3"
+		"php": ">=5.3.3",
+		"phpbb/phpbb": ">=3.3"
 	},
 	"require-dev": {
 		"phpbb/epv": "dev-master"
@@ -24,7 +38,12 @@
 	"extra": {
 		"display-name": "RH Topic Tags",
 		"soft-require": {
-			"phpbb/phpbb": ">=3.3"
+			"phpbb/phpbb": ">=3.3.5"
+		},
+		"version-check": {
+			"host": "www.phpbb.com",
+			"directory": "/customise/db/extension/rh_topic_tags",
+			"filename": "version_check"
 		}
 	}
 }

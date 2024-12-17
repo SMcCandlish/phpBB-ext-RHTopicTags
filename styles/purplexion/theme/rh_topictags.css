@@ -3,6 +3,21 @@
  *	For the tag cloud, rh_topictags_smallest etc. are used to define the size of the tags.
  */
 
+div.tags
+{
+	background-color:	#000;
+}
+
+.ng-valid
+{
+    background-color:	#383243;
+}
+
+.tag-item
+{
+	color:	#9f97af;
+}
+
 .rh_topictags_tagcloud
 {
 	width:	85%;
@@ -24,7 +39,7 @@ tags-input .tags .tag-item
 	text-align:			center;
 	background:			none;
 	border-radius:		10px;
-	background-color:	#cadceb;
+	background-color:	#32184c;
 }
 
 .rh_topictags_tagcloud li
@@ -43,7 +58,7 @@ tags-input .tags .tag-item
 
 .rh_topictags_count
 {
-	color:		#555;
+	color:		#605479;
 	font-size:	x-small;
 }
 
@@ -52,7 +67,7 @@ tags-input .tags .tag-item
 tags-input .tags .tag-item:hover
 {
 	border-radius:		10px;  /* Seems redundant, but without this, the buttons may lose their curved border when hovered, in some browser+theme combinations. */
-	background-color:	#105289;
+	background-color:	#32184c;
 }
 
 .rh_topictags_tagcloud li:hover .rh_topictags_count,
@@ -61,8 +76,8 @@ tags-input .tags .tag-item:hover
 tags-input .tags .tag-item:hover,
 tags-input .tags .tag-item:hover a
 {
-	color:				#cadceb;
-	background-color:	#105289;
+	color:				#d1c7ea;
+	background-color:	#32184c;
 }
 
 /* ----------- tag sizes for tag-cloud ----------- */

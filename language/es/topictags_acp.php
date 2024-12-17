@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB Extension - RH Topic Tags
-* @copyright (c) 2014 Robet Heim
+* @copyright © 2014 Robert Heim
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -17,22 +17,61 @@ if (empty($lang) || !is_array($lang))
 	$lang = array();
 }
 
-// these will be re-used in the definitions below - that is why we need to define and merge them first.
+// Estos se reutilizarán en las definiciones siguientes; es por eso que necesitamos definirlos y fusionarlos primero.
 $lang = array_merge($lang, array(
-	'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[\- a-z0-9]{3,30}$/i',
-	'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> '-, 0-9, a-z, A-Z, espacios (se convertirán a -), min: 3, max: 30',
+
+	// Versión simplificada, principalmente para uso en idioma inglés.
+	// No permite letras con diacríticas, guiones bajos, ni puntos.
+	// Tiene un mínimo de 2 caracteres, para acrónimos comunes como "AI", "EU", etc.:
+	// 'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[a-z0-9\- ]{2,30}$/i',
+	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'letras del alfabeto latino, 0–9, guión, carácter espacial (se convertirá a -); mín.: 2, máx.: 30',
+	//
+	// Versión de Europa occidental. Permite letras con diacríticas.
+	// Tiene un mínimo de 2 caracteres, para acrónimos comunes como "AI", "EU", etc.:
+	'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[\p{Script=Latin}0-9\-_\. ]{2,30}$/u',
+	'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'letras del alfabeto latino, 0–9, guión, guión bajo, punto, carácter espacial (se convertirá a -); mín.: 2, máx.: 30',
+	//
+	// Versión de Eurasia occidental (incluye compatibilidad con griego,
+	// cirílico, y hebreo)
+	// Tiene un mínimo de 2 caracteres, para acrónimos comunes como "AI", "EU", etc.:
+	// 'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[\p{Script=Latin}\p{Script=Greek}\p{Script=Cyrillic}\p{Script=Hebrew}0-9\-_\. ]{2,30}$/u',
+	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'letras (latinas, griegas, cirílicas, hebreas), 0–9, guión, guión bajo, punto, carácter espacial (se convertirá a -); mín.: 2, máx.: 30',
+	//
+	// Versión totalmente internacionalizada
+	// Tiene un mínimo de 1, porque en muchos casos un ideograma del este de Asia para una frase completa es un solo carácter:
+	// 'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[\p{L}0-9\-_\. ]{1,30}$/u',
+	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'letras en cualquier idioma, 0–9, guión, guión bajo, punto, carácter espacial (se convertirá a -); mín.: 1, máx.: 30',
+	//
+	// Como puede ver en esto, si necesita habilitar soporte para algo
+	// especial, como caracteres lingüísticos o matemáticos, solo necesita
+	// agregar bloques Unicode específicos o códigos que representen rangos
+	// de dichos bloques.
+	//
+	// Si necesita caracteres especiales adicionales, como @ y $, simplemente
+	// agréguelos individualmente. Pero lea sobre cómo escribir expresiones
+	// regulares (regex):
+	// https://stackoverflow.com/questions/399078/what-special-characters-must-be-escaped-in-regular-expressions
+	// Varios caracteres deben "escaparse" con \ (y esta es una regex de PCRE,
+	// por lo que utiliza las reglas de escape de PCRE). Un caso común sería el
+	// de incluir # en los hashtags. No es necesario que este carácter se
+	// escape, solo se agrega al final de la selección [...], p. ej.:
+	// '/^[\p{L}0-9\-_\. #]{1,30}$/u'
+	//
+	// También puedes cambiar cualquiera de estos para que tenga un mínimo de
+	// 1 carácter, como {1,30}, si necesitas tener en cuenta cosas como el
+	// lenguaje de programación llamado R.
 ));
 
 $lang = array_merge($lang, array(
-	// forum settings page
-	'ACP_RH_TOPICTAGS_ENABLE'								=> 'Habilitar RH Etiquetas de temas',
+	// Se utiliza en la página para configurar un foro
+	'ACP_RH_TOPICTAGS_ENABLE'								=> 'Habilitar RH Etiquetas de Temas (RH Topic Tags)',
 	'ACP_RH_TOPICTAGS_ENABLE_EXP'							=> 'Sea o no habilitado el etiquetado de los temas en este foro. (Al desactivar el etiquetado, las etiquetas no serán eliminadas de los temas en este foro, por lo que cuando se habilite de nuevo, todavía estarán allí, si realmente desea eliminar las etiquetas, utilice la opción “Eliminar las etiquetas de este foro”.)',
 	'ACP_FORUM_SETTINGS_RH_TOPICTAGS_PRUNE'					=> 'Eliminar las etiquetas de este foro',
-	'ACP_FORUM_SETTINGS_RH_TOPICTAGS_PRUNE_EXP'				=> 'Esto ELIMINARÁ todas las asignaciones de las etiquetas de los temas de este foro. NOTA: Para evitar el borrado accidental de las etiquetas, es necesario deshabilitar el etiquetado para este foro.',
-	'ACP_FORUM_SETTINGS_RH_TOPICTAGS_PRUNE_CONFIRM'			=> 'Esta opción ELIMINARÁ todas las asignaciones de las etiquetas de los temas de este foro, hay que desactivar el etiquetado de este foro para realizar esta acción.',
+	'ACP_FORUM_SETTINGS_RH_TOPICTAGS_PRUNE_EXP'				=> 'Esto <strong>eliminará</strong> todas las asignaciones de las etiquetas de los temas de este foro. <strong>Nota</strong>: Para evitar el borrado accidental de las etiquetas, es necesario deshabilitar el etiquetado para este foro.',
+	'ACP_FORUM_SETTINGS_RH_TOPICTAGS_PRUNE_CONFIRM'			=> 'Esta opción <strong>eliminará</strong> todas las asignaciones de las etiquetas de los temas de este foro, hay que desactivar el etiquetado de este foro para realizar esta acción.',
 	'ACP_RH_TOPICTAGS_PRUNING_REQUIRES_TAGGING_DISABLED'	=> 'Para evitar el borrado accidental de las etiquetas, es necesario deshabilitar el etiquetado de este foro para eliminar las asignaciones de etiqueta.',
 
-	// config
+	// configuración
 	'TOPICTAGS_INSTALLED'					=> 'Versión instalada: v%s',
 
 	'ACP_RH_TOPICTAGS_REGEX_EMPTY'			=> 'La expresión regular no se puede dejar vacía.',
@@ -42,7 +81,7 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_CONFIG_TAGCLOUD'			=> 'Ajustes de nube de etiquetas',
 	'TOPICTAGS_CONFIG_TAGS'				=> 'Ajustes de etiquetas',
 	'TOPICTAGS_MAINTENANCE'				=> 'Mantenimiento',
-	'TOPICTAGS_TITLE'					=> 'RH Etiquetas de temas',
+	'TOPICTAGS_TITLE'					=> 'RH Etiquetas de Temas',
 	'TOPICTAGS_SETTINGS_SAVED'			=> 'Configuración actualizada correctamente.',
 	'TOPICTAGS_WHITELIST_SAVED'			=> 'Lista blanca actualizada correctamente.',
 	'TOPICTAGS_BLACKLIST_SAVED'			=> 'Lista negra actualizada correctamente.',
@@ -60,7 +99,7 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_DISPLAY_TAGS_IN_VIEWFORUM_EXP'	=> 'Si se establece en sí, las etiquetas asignadas para cada tema se muestran en la lista de tema.',
 
 	'TOPICTAGS_ENABLE_IN_ALL_FORUMS_ALREADY'	=> 'El etiquetado ya está habilitado para todos los foros.',
-	'TOPICTAGS_ENABLE_IN_ALL_FORUMS'			=> 'Habilitar RH Etiquetas de temas en todos los foros',
+	'TOPICTAGS_ENABLE_IN_ALL_FORUMS'			=> 'Habilitar RH Etiquetas de Temas en todos los foros',
 	'TOPICTAGS_ENABLE_IN_ALL_FORUMS_EXP'		=> 'Esto permitirá que el etiquetado en <em>todos</em> los foros. Lo puede activar (o desactivar) en un solo foro desde la configuración del foro.',
 	'TOPICTAGS_ENABLE_IN_ALL_FORUMS_DONE'	=> array(
 			1 => 'El etiquetado se ha habilitado para %d foro.',
@@ -68,7 +107,7 @@ $lang = array_merge($lang, array(
 	),
 
 	'TOPICTAGS_DISABLE_IN_ALL_FORUMS_ALREADY'	=> 'El etiquetado ya está deshabilitado para todos los foros.',
-	'TOPICTAGS_DISABLE_IN_ALL_FORUMS'			=> 'Deshabilitar RH Etiquetas de temas en todos los foros',
+	'TOPICTAGS_DISABLE_IN_ALL_FORUMS'			=> 'Deshabilitar RH Etiquetas de Temas en todos los foros',
 	'TOPICTAGS_DISABLE_IN_ALL_FORUMS_EXP'		=> 'Esto deshabilita el etiquetado en <em>todos</em> los foros. Lo puede activar (o desactivar) en un solo foro desde la configuración del foro.',
 	'TOPICTAGS_DISABLE_IN_ALL_FORUMS_DONE'	=> array(
 			1 => 'El etiquetado se ha deshabilitado para %d foro.',
@@ -102,25 +141,25 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_CALC_COUNT_TAGS_DONE'			=> 'El contador de etiquetas se ha recalculado.',
 
 	'TOPICTAGS_ENABLE_WHITELIST'				=> 'Habilitar Lista blanca',
-	'TOPICTAGS_ENABLE_WHITELIST_EXP'			=> 'Si está habilitado, sólo etiquetas que son conformes con la expresión regular y están presentes en la lista blanca de abajo estarán permitidas.<br/>NOTA 1: Si la lista negra está activada, también, y es una etiqueta en la lista blanca, así como en la lista negra, será rechazada.<br/>NOTA 2: Para evitar la pérdida accidental de datos, las etiquetas que ya están en la base de datos, pero no en la lista blanca no se eliminan automáticamente y se mostrarán también. Debe quitar las etiquetas existentes con a mano.',
+	'TOPICTAGS_ENABLE_WHITELIST_EXP'			=> 'Si está habilitado, sólo etiquetas que son conformes con la expresión regular y están presentes en la lista blanca de abajo estarán permitidas.<br /><strong>Nota 1</strong>: Si la lista negra está activada, también, y es una etiqueta en la lista blanca, así como en la lista negra, será rechazada.<br /><strong>Nota 2</strong>: Para evitar la pérdida accidental de datos, las etiquetas que ya están en la base de datos, pero no en la lista blanca no se eliminan automáticamente y se mostrarán también. Debe quitar las etiquetas existentes con a mano.',
 
 	'TOPICTAGS_WHITELIST'						=> 'Lista blanca',
-	'TOPICTAGS_WHITELIST_EXP'					=> 'Lista de etiquetas permitidas.<br/>NOTA: Las etiquetas deben ser conformes con la expresión regular, así, así que asegúrese de que todas estas etiquetas se ajustan a sus expresiones regulares (ajustes de abajo, no controladas de forma automática).',
+	'TOPICTAGS_WHITELIST_EXP'					=> 'Lista de etiquetas permitidas.<br /><strong>Nota</strong>: Las etiquetas deben ser conformes con la expresión regular, así, así que asegúrese de que todas estas etiquetas se ajustan a sus expresiones regulares (ajustes de abajo, no controladas de forma automática).',
 
 	'TOPICTAGS_ENABLE_BLACKLIST'				=> 'Habilitar Lista negra',
-	'TOPICTAGS_ENABLE_BLACKLIST_EXP'			=> 'Si está activado, las variables configuradas en la lista negra serán rechazadas, incluso si están conformes con la expresión regular.<br/>NOTA 1: Para evitar la pérdida accidental de datos, las etiquetas que ya están en la base de datos no se eliminan automáticamente. Debe eliminar a mano de cada tema.<br/>NOTA 2: La lista negra nunca se muestra a los usuarios.',
+	'TOPICTAGS_ENABLE_BLACKLIST_EXP'			=> 'Si está activado, las variables configuradas en la lista negra serán rechazadas, incluso si están conformes con la expresión regular.<br /><strong>Nota 1</strong>: Para evitar la pérdida accidental de datos, las etiquetas que ya están en la base de datos no se eliminan automáticamente. Debe eliminar a mano de cada tema.<br /><strong>Nota 2</strong>: La lista negra nunca se muestra a los usuarios.',
 
 	'TOPICTAGS_BLACKLIST'						=> 'Lista negra',
-	'TOPICTAGS_BLACKLIST_EXP'					=> 'Lista de etiquetas prohibidas.<br/>NOTA: Todas las etiquetas que no están conformes con la expresión regular siempre serán rechazadas.',
+	'TOPICTAGS_BLACKLIST_EXP'					=> 'Lista de etiquetas prohibidas.<br /><strong>Nota</strong>: Todas las etiquetas que no están conformes con la expresión regular siempre serán rechazadas.',
 
 	'TOPICTAGS_ALLOWED_TAGS_REGEX'				=> 'Expresión regular para etiquetas permitidas',
-	'TOPICTAGS_ALLOWED_TAGS_REGEX_EXP'			=> 'ADVERTENCIA: No cambie esto, si no sabe lo que está haciendo. <strong>Las etiquetas pueden ser de 30 caracteres como máximo</strong>, por favor considere esto durante el diseño de expresiones regulares.<br/>Tenga en cuenta que las etiquetas no válidas, no se pueden buscar después, pero todavía se muestran en los temas.<br/>Considere la limpieza de las etiquetas no válidas (ver sección de mantenimiento).<br/>Por defecto: ' . $lang['ACP_RH_TOPICTAGS_REGEX_DEFAULT'],
+	'TOPICTAGS_ALLOWED_TAGS_REGEX_EXP'			=> '<strong>Advertencia</strong>: No cambie esto, si no sabe lo que está haciendo. <strong>Las etiquetas pueden tener un máximo de 30 caracteres y el delimitador entre ellas en la base de datos es “/”, por lo que ese carácter no debe agregarse a la expresión regular (individualmente o como parte de una clase) para que sea permisible en las etiquetas.</strong> Por favor considere esto durante el diseño de expresiones regulares.<br />Tenga en cuenta que las etiquetas no válidas, no se pueden buscar después, pero todavía se muestran en los temas.<br />Considere la limpieza de las etiquetas no válidas (ver sección de Mantenimiento).<br />Por defecto: ' . $lang['ACP_RH_TOPICTAGS_REGEX_DEFAULT'],
 
 	'TOPICTAGS_CONVERT_SPACE_TO_MINUS'			=> 'Convertir “ ” a “-”',
-	'TOPICTAGS_CONVERT_SPACE_TO_MINUS_EXP'		=> 'Si se establece en sí, todos los espacios (“ ”) se convierten automáticamente a menos (“-”).<br/>NOTA 1: En la expresión regular se debe permitir “-”; de lo contrario se rechazarán las etiquetas con espacios en blanco.<br/>NOTA 2: Las etiquetas existentes con espacios NO se convertirán automáticamente.',
+	'TOPICTAGS_CONVERT_SPACE_TO_MINUS_EXP'		=> 'Si se establece en sí, todos los espacios (“ ”) se convierten automáticamente a guión (“-”).<br /><strong>Nota 1</strong>: En la expresión regular se debe permitir “-”; de lo contrario se rechazarán las etiquetas con espacios en blanco.<br /><strong>Nota 2</strong>: Las etiquetas existentes con espacios NO se convertirán automáticamente.',
 
 	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS'		=> 'Explicación para los usuarios',
-	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS_EXP'	=> 'Este texto se muestra a los usuarios y debe explicar qué etiquetas se permiten, y cuáles no.<br/>Por defecto: ' . $lang['ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'],
+	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS_EXP'	=> 'Este texto se muestra a los usuarios y debe explicar qué etiquetas se permiten, y cuáles no.<br />Por defecto: ' . $lang['ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'],
 
 	'TOPICTAGS_MANAGE_TAGS_EXP'					=> 'La tabla muestra todas las etiquetas existentes. Aquí puede eliminarlas (y todas sus asignaciones) o editar una etiqueta. También puede combinar etiquetas, con la edición de una etiqueta y el establecimiento de su nombre para que sea igual a otra etiqueta y así se fusionarán automáticamente.',
 	'TOPICTAGS_NO_TAGS'							=> 'No hay etiquetas todavía.',
@@ -128,7 +167,7 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_ASSIGNMENTS'						=> 'Asignaciones',
 	'TOPICTAGS_NEW_TAG_NAME'					=> 'Nuevo nombre de etiqueta',
 	'TOPICTAGS_NEW_TAG_NAME_EXP'				=> 'Por favor, introduzca un nuevo nombre de etiqueta.',
-	'TOPICTAGS_TAG_DELETE_CONFIRM'				=> '¿Seguro que quiere eliminar la etiqueta <em>%s</em>? Esto eliminará la etiqueta de <b>todos los temas</b> donde se le asignó. Esto no puede ser revertido.',
+	'TOPICTAGS_TAG_DELETE_CONFIRM'				=> '¿Seguro que quiere eliminar la etiqueta <i>%s</i>? Esto eliminará la etiqueta de <strong>todos los temas</strong> donde se le asignó. <em>Esto no puede ser revertido.</em>',
 	'TOPICTAGS_TAG_DELETED'						=> 'La etiqueta ha sido borrada.',
 	'TOPICTAGS_MISSING_TAG_ID'					=> 'Falta el ID de la etiqueta.',
 	'TOPICTAGS_TAG_CHANGED'						=> 'La etiqueta ha sido cambiada.',
@@ -138,8 +177,8 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_TAG_DOES_NOT_EXIST'				=> 'La etiqueta “%s” no existe.',
 	'TOPICTAGS_NO_MODIFICATION'					=> 'La etiqueta no fue cambiada.',
 
-	'TOPICTAGS_SORT_NAME_ASC'					=> 'Nombre de etiqueta A&rArr;Z', // &rArr; is a right-arrow (=>)
-	'TOPICTAGS_SORT_NAME_DESC'					=> 'Nombre de etiqueta Z&rArr;A', // &rArr; is a right-arrow (=>)
+	'TOPICTAGS_SORT_NAME_ASC'					=> 'Nombre de etiqueta A&rarr;Z', // &rarr; es una flecha que apunta hacia la derecha (→)
+	'TOPICTAGS_SORT_NAME_DESC'					=> 'Nombre de etiqueta Z&rarr;A',
 	'TOPICTAGS_SORT_COUNT_ASC'					=> 'Orden de asignaciones ascendente',
 	'TOPICTAGS_SORT_COUNT_DESC'					=> 'Orden de asignaciones descendente',
 

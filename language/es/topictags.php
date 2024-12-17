@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB Extension - RH Topic Tags
-* @copyright (c) 2014 Robet Heim
+* @copyright © 2014 Robert Heim
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -22,13 +22,14 @@ $lang = array_merge($lang, array(
 
 	'RH_TOPICTAGS_TAGCLOUD'				=> 'Nube de etiquetas',
 
-	'RH_TOPICTAGS_ALLOWED_TAGS'			=> 'Etiquetas permitidas:',
+	'RH_TOPICTAGS_ALLOWED_TAGS'			=> 'Caracteres permitidas:',
 	'RH_TOPICTAGS_WHITELIST_EXP'		=> 'Sólo estas etiquetas están permitidas:',
 
 	'RH_TOPICTAGS_SEARCH_HEADER_OR'		=> 'Búsqueda de temas con cualquiera de estas etiquetas: %s',
 	'RH_TOPICTAGS_SEARCH_HEADER_AND'	=> 'Búsqueda de temas con todas estas etiquetas: %s',
 	'RH_TOPICTAGS_SEARCH_IGNORED_TAGS'	=> 'Las siguientes etiquetas han sido ignoradas, porque no son válidas: %s',
 
+	'RH_TOPICTAGS_NO_TOPICS_FOR_NO_TAG'		=> 'Busque al menos una etiqueta válida para mostrar temas aquí.',
 	'RH_TOPICTAGS_NO_TOPICS_FOR_TAG_OR'		=> 'No hay temas etiquetados con cualquiera de estas etiquetas:  %s',
 	'RH_TOPICTAGS_NO_TOPICS_FOR_TAG_AND'	=> 'No hay temas etiquetados con estas etiquetas: %s',
 
@@ -42,4 +43,7 @@ $lang = array_merge($lang, array(
 		2 => 'Mostrando las TOP %d etiquetas.',
 	),
 
+	'RH_TOPICTAGS_TAG_SEARCH' => 'Buscar etiquetas',
+
+	'RH_TOPICTAGS_TAG_SUGGEST_TAG_ROUTE_ERROR' => 'No se encontró ninguna ruta para “%s”',
 ));
