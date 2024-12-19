@@ -32,8 +32,8 @@ class topic
 	/** @var int */
 	private $topic_id;
 
-	// unread_topic should be based on the users topic tracking info
-	// this wont be supported until phpbb code is less complex
+	// Unread_topic should be based on the user's topic tracking info;
+	// this won't be supported until phpBB code is less complex.
 	/** @var boolean */
 	private $unread_topic = false;
 
