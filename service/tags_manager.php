@@ -48,7 +48,8 @@ class tags_manager
 					\phpbb\config\db_text $config_text,
 					\phpbb\auth\auth $auth,
 					db_helper $db_helper,
-					$table_prefix)
+					$table_prefix
+	)
 	{
 		$this->db			= $db;
 		$this->config		= $config;
