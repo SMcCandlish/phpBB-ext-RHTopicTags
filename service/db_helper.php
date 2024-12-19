@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB Extension - RH Topic Tags
-* @copyright © 2014 Robert Heim
+* @copyright © 2014 Robert Heim; signficant overhauling © 2024 S. McCandlish (under same license).
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 */
 namespace robertheim\topictags\service;
@@ -45,7 +45,10 @@ class db_helper
 	}
 
 	/**
-	 * Executes the given sql and creates an array from the result using the $field_name column.
+	 * Executes the given SQL and creates an array from the result using the
+	 * $field_name column(s). When $field_name is just a string, the resulting
+	 * array will be simple indexed; when $field_name is an array, this
+	 * function's returned array will be a complex array (of arrays).
 	 *
 	 * @param string $sql
 	 *        	the sql string whose result contains a column named $field_name
@@ -57,13 +60,29 @@ class db_helper
 	{
 		$result = $this->db->sql_query($sql);
 		$re = array();
+
 		while ($row = $this->db->sql_fetchrow($result))
 		{
-			$re[] = $row[$field_name];
+			// If $field_name is an array, use each one and create an array of arrays
+			if (is_array($field_name)) {
+				$values = array();
+				foreach ($field_name as $field) {
+					$values[$field] = $row[$field];
+				}
+				$re[] = $values;
+			} else {
+				// Default case, when it's just a single field name
+				$re[] = $row[$field_name];
+			}
 		}
+
 		$this->db->sql_freeresult($result);
 		return $re;
-	}
+	}	// Usage note: various portions of RH Topic Tags are expecting tags'
+		// names in a simple array to operate immediately on them as strings.
+		// So the average function calling THIS function needs to flatten
+		// any complex array it returns for further processing, e.g. with:
+		// $tagNames = array_map(function($tag) { return $tag['tag']; }, $sortedTags);
 
 	/**
 	 * Executes the sql and fetches the rows as array.
