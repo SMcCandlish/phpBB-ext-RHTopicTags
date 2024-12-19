@@ -56,8 +56,9 @@ class tagcloud_manager
 	}
 
 	/**
-	 * Assigns all required data for the tag cloud to the template so that including tagcloud.html can display the tag cloud.
-	 * @param $limit the limit for assigned tags. If 0 (default) the config limit is used; if $limit <= -1 all tags will be shown; $limit otherwise.
+	 * Assigns all required data for the tag cloud to the template so that
+	 * including tagcloud.html can display the tag cloud.
+	 * @param $limit	The limit for assigned tags. If 0 (default), the config limit is used; if $limit <= -1 all tags will be shown; $limit otherwise.
 	 */
 	public function assign_tagcloud_to_template($limit = 0)
 	{
@@ -66,8 +67,8 @@ class tagcloud_manager
 			$limit = $this->config[prefixes::CONFIG . '_max_tags_in_tagcloud'];
 		}
 
-		// get the data
-		// when $limit is still 0 there should not be displayed any tags
+		// Get the data.
+		// When $limit is still 0, no tags should be displayed.
 		$tags = (0 == $limit) ? array() : $this->get_top_tags($limit);
 		$maximum = $this->get_maximum_tag_usage_count();
 
@@ -81,14 +82,14 @@ class tagcloud_manager
 			? $this->user->lang('RH_TOPICTAGS_DISPLAYING_TOTAL_ALL')
 			: $show_count = $this->user->lang('RH_TOPICTAGS_DISPLAYING_TOTAL', $limit);
 
-		// ensure that the css for the tag cloud will be included
+		// Ensure that the CSS for the tag cloud will be included:
 		$this->template->assign_vars(array(
 			'S_RH_TOPICTAGS_INCLUDE_CSS'		=> true,
 			'RH_TOPICTAGS_TAGCLOUD_SHOW_COUNT'	=> $this->config[prefixes::CONFIG . '_display_tagcount_in_tagcloud'],
 			'RH_TOPICTAGS_TAGCLOUD_TAG_COUNT'	=> $show_count,
 		));
 
-		// display it
+		// Display it:
 		foreach ($tags as $tag)
 		{
 			$css_class = $this->get_css_class($tag['count'], $maximum);
@@ -106,10 +107,10 @@ class tagcloud_manager
 	}
 
 	/**
-	 * Gets the $limit most used tags.
+	 * Gets the most-used tags, up to $limit (if positive).
 	 *
-	 * @param $limit max results, gets all tags if <1
-	 * @return array (array('tag' => string, 'count' => int), ...)
+	 * @param $limit	max results, gets all tags if <1
+	 * @return array	(array('tag' => string, 'count' => int), ...)
 	 */
 	public function get_top_tags($limit)
 	{
@@ -144,7 +145,7 @@ class tagcloud_manager
 	/**
 	 * Get the usage count of the tag that is used the most
 	 *
-	 * @return int maximum
+	 * @return int	maximum
 	 */
 	private function get_maximum_tag_usage_count()
 	{
@@ -166,9 +167,9 @@ class tagcloud_manager
 	/**
 	 * Determines the size of the tag depending on its usage count
 	 *
-	 * @param $count the count of usages of a tag
-	 * @param $maximum the usage-count of the most used tag
-	 * @return string the css class name
+	 * @param $count	the count of uses of a tag
+	 * @param $maximum	the usage count of the most-used tag
+	 * @return string	the CSS class name
 	 */
 	private function get_css_class($count, $maximum)
 	{
