@@ -54,7 +54,7 @@ class main_test extends topictags_functional_test_base
 		$this->delete_topic($topic_id2);
 
 		global $table_prefix;
-		// ensure that the tags are no longer assigned to the deleted topic
+		// ensure that the tags no longer are assigned to the deleted topic
 		$result = $this->db->sql_query(
 			'SELECT COUNT(*) as count
 			FROM ' . $table_prefix .
@@ -63,7 +63,7 @@ class main_test extends topictags_functional_test_base
 		$assigned_tags_count = $this->db->sql_fetchfield('count');
 		$this->assertEquals(0, $assigned_tags_count);
 
-		// ensure that the tag still is assigned the undeleted topic
+		// ensure that the tag still is assigned to the undeleted topic
 		$result = $this->db->sql_query(
 			'SELECT COUNT(*) as count
 			FROM ' . $table_prefix .
@@ -72,13 +72,11 @@ class main_test extends topictags_functional_test_base
 		$assigned_tags_count = $this->db->sql_fetchfield('count');
 		$this->assertEquals(1, $assigned_tags_count);
 
-		// ensure that the tag that was only assigned to the deleted topic
-		// has been deleted
+		// ensure deletion of tag that was only assigned to the deleted topic
 		$existing_tags = $this->tags_manager->get_existing_tags(array($tagname2), true);
 		$this->assertEquals(0, sizeof($existing_tags));
 
-		// ensure that the tag that was assigned to both topics
-		// still exists
+		// ensure conitinued existence of tag that was assigned to both topics
 		$existing_tags = $this->tags_manager->get_existing_tags(array($tagname), true);
 		$this->assertEquals(1, sizeof($existing_tags));
 	}
