@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB Extension - RH Topic Tags
-* @copyright © 2014 Robert Heim
+* @copyright © 2014 Robert Heim; signficant overhauling and new functions © 2024 S. McCandlish (under same license).
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -19,7 +19,7 @@ use robertheim\topictags\service\db_helper;
 /**
 * Handles all functionallity regarding tags.
 * This class is basically a manager (functions for cleaning and validating tags)
-* and a DAO (storing/retrieving tags to/from the DB).
+* and a DAO (storing tags to and retrieving them from the database).
 */
 class tags_manager
 {
@@ -59,10 +59,10 @@ class tags_manager
 	}
 
 	/**
-	 * Remove all tags from the given topic
+	 * Remove all tags from the given (single) topic.
 	 *
-	 * @param $topic_id
-	 * @param $delete_unused_tags if set to true unused tags are removed from the db.
+	 * @param $topic_id				topic ID
+	 * @param $delete_unused_tags 	If set to true, unused tags are removed from the db.
 	 */
 	public function remove_all_tags_from_topic($topic_id, $delete_unused_tags = true)
 	{
@@ -70,10 +70,10 @@ class tags_manager
 	}
 
 	/**
-	 * Remove tag assignments from the given topics
+	 * Remove tag assignments from the given (multiple) topics.
 	 *
-	 * @param $topic_ids array of topic ids
-	 * @param $delete_unused_tags if set to true unused tags are removed from the db.
+	 * @param $topic_ids			array of topic IDs
+	 * @param $delete_unused_tags	If set to true, unused tags are removed from the db.
 	 */
 	public function remove_all_tags_from_topics(array $topic_ids, $delete_unused_tags = true)
 	{
@@ -89,7 +89,7 @@ class tags_manager
 	}
 
 	/**
-	 * Gets the ids of all tags, that are not assigned to a topic.
+	 * Gets the IDs of all tags that are not assigned to a topic.
 	 */
 	private function get_unused_tag_ids()
 	{
@@ -106,7 +106,7 @@ class tags_manager
 	/**
 	 * Removes all tags that are not assigned to at least one topic (garbage collection).
 	 *
-	 * @return integer count of deleted tags
+	 * @return integer	count of deleted tags
 	 */
 	public function delete_unused_tags()
 	{
@@ -123,9 +123,9 @@ class tags_manager
 	}
 
 	/**
-	 * Deletes all assignments of tags, that are no longer valid
+	 * Deletes all assignments of tags that are no longer valid.
 	 *
-	 * @return integer count of removed assignments
+	 * @return integer	count of removed assignments
 	 */
 	public function delete_assignments_of_invalid_tags()
 	{
@@ -157,6 +157,11 @@ class tags_manager
 		return $removed_count;
 	}
 
+	/**
+	 * Identifies all topic tag-assignments where the topic does not exist anymore.
+	 *
+	 * @return array	array of "dead" tag-assignments
+	 */
 	private function get_assignment_ids_where_topic_does_not_exist()
 	{
 		$sql = 'SELECT tt.id
@@ -170,9 +175,9 @@ class tags_manager
 	}
 
 	/**
-	 * Removes all topic-tag-assignments where the topic does not exist anymore.
+	 * Removes all topic tag-assignments where the topic does not exist anymore.
 	 *
-	 * @return integer count of deleted assignments
+	 * @return integer	count of deleted assignments
 	 */
 	public function delete_assignments_where_topic_does_not_exist()
 	{
@@ -194,10 +199,10 @@ class tags_manager
 	}
 
 	/**
-	 * Deletes all topic-tag-assignments where the topic resides in a forum with tagging disabled.
+	 * Deletes all topic tag-assignments where the topic resides in a forum with tagging disabled.
 	 *
-	 * @param $forum_ids array of forum-ids that should be checked (if null, all are checked).
-	 * @return integer count of deleted assignments
+	 * @param $forum_ids	array of forum-ids that should be checked (if null, all are checked)
+	 * @return integer		count of deleted assignments
 	 */
 	public function delete_tags_from_tagdisabled_forums($forum_ids = null)
 	{
@@ -207,13 +212,13 @@ class tags_manager
 		{
 			if (empty($forum_ids))
 			{
-				// performance improvement because we already know the result of querying the db.
+				// Performance improvement, because we already know the result of querying the db.
 				return 0;
 			}
 			$forums_sql_where = ' AND ' . $this->db->sql_in_set('f.forum_id', $forum_ids);
 		}
 
-		// get ids of all topic-assignments to topics that reside in a forum with tagging disabled.
+		// Get IDs of all topic tag-assignments to topics that reside in a forum with tagging disabled.
 		$sql = 'SELECT tt.id
 			FROM ' . $this->table_prefix . tables::TOPICTAGS . ' tt
 			WHERE EXISTS (
@@ -243,33 +248,51 @@ class tags_manager
 		return $removed_count;
 	}
 
-
 	/**
-	 * Gets all assigned tags
-	 *
-	 * @param $topic_id
-	 * @return array of tag names
-	 */
-	public function get_assigned_tags($topic_id)
+	* Gets all tags assigned to a topic (and sorts them).
+	*
+	* @param $topic_id        a single topic ID
+	* @param $casesensitive   whether to sort the tags case-sensitively
+	* @return array           array of sorted tag names
+	*/
+	public function get_assigned_tags($topic_id, $casesensitive = false)
 	{
 		$topic_id = (int) $topic_id;
-		$sql = 'SELECT t.tag
-			FROM
-				' . $this->table_prefix . tables::TAGS . ' AS t,
-				' . $this->table_prefix . tables::TOPICTAGS . " AS tt
-			WHERE tt.topic_id = $topic_id
-				AND t.id = tt.tag_id";
-		return $this->db_helper->get_array_by_fieldname($sql, 'tag');
+
+		// Fetch the tags, for this topic, from the database:
+		$sql = 'SELECT t.tag, t.tag_lowercase
+            FROM ' . $this->table_prefix . tables::TAGS . ' AS t,
+                 ' . $this->table_prefix . tables::TOPICTAGS . " AS tt
+            WHERE tt.topic_id = $topic_id
+                AND t.id = tt.tag_id";
+		$tagslist = $this->db_helper->get_array_by_fieldname($sql, ['tag', 'tag_lowercase']);
+
+		// Run the array of tags through the sorter:
+		$sortedTags = $this->sort_tags($tagslist, $casesensitive);
+
+		// Flatten the array of sorted tags, to return only the tag names
+		// (we have no use of the forced-lowercase versions after sorting,
+		// and downstream uses, like urlencode(), expect strings from an array
+		// not arrays from a meta-array):
+		$tagNames = array_map(function($tag) {
+			return $tag['tag']; // Extract only the 'tag' value
+		}, $sortedTags);
+
+		// Return the flattened array of tag names
+		return $tagNames;
 	}
 
 	/**
+	 * This runs the tag suggestions that pop up when you start entering a tag
+	 * when editing tags in a post (e.g., you type "h", "e", "l", and if "help"
+	 * already exists as a tag, it will be suggested as a match).
 	 * Gets $count tags that start with $query, ordered by their usage count (desc).
 	 * Note: that $query needs to be at least 3 characters long.
 	 *
-	 * @param $query prefix of tags to search
-	 * @param $exclude array of tags that should be ignored
-	 * @param $count count of tags to return
-	 * @return array (array('text' => '...'), array('text' => '...'))
+	 * @param $query	prefix of tags to search
+	 * @param $exclude	array of tags that should be ignored
+	 * @param $count	count of tags to return
+	 * @return array	(array('text' => '...'), array('text' => '...'))
 	 */
 	public function get_tag_suggestions($query, $exclude, $count)
 	{
@@ -301,13 +324,13 @@ class tags_manager
 		}
 		$this->db->sql_freeresult($result);
 		return $tags;
-	}
+	} // It's unclear why the min. is 3; changing it to 2 above has no effect.
 
 	/**
 	 * Assigns exactly the given valid tags to the topic (all other tags are removed from the topic and if a tag does not exist yet, it will be created).
 	 *
 	 * @param $topic_id
-	 * @param $valid_tags			array containing valid tag-names
+	 * @param $valid_tags	array containing valid tag-names
 	 */
 	public function assign_tags_to_topic($topic_id, $valid_tags)
 	{
@@ -342,9 +365,9 @@ class tags_manager
 	private function create_missing_tags($tags)
 	{
 		// we will get all existing tags of $tags
-		// and then substract these from $tags
+		// and then subtract these from $tags
 		// result contains the tags that needs to be created
-		// to_create = $tags - exting
+		// to_create = $tags - existing
 
 		// ensure that there isn't a tag twice in the array
 		$tags = array_unique($tags);
@@ -385,12 +408,14 @@ class tags_manager
 	}
 
 	/**
-	 * Gets the existing tags of the given tags or all existing tags if $tags == null.
-	 * If $only_ids is set to true, an array containing only the ids of the tags will be returned: array(1,2,3,..)
+	 * Gets the existing tags, out of the tags given in $tags, or out of all
+	 * existing tags if $tags == null. If $only_ids is set to true, an array
+	 * containing only the IDs of the tags will be returned, instead of IDs +
+	 * tag names: array(1,2,3,..)
 	 *
-	 * @param $tags array of tag-names; might be null to get all existing tags
-	 * @param $only_ids whether to return only the tag-ids (true) or tag names as well (false, default)
-	 * @return array an array of the form array(array('id'=>.. , 'tag'=> ..), array('id'=>.. , 'tag'=> ..), ...) or array(1,2,3,..) if $only_ids==true
+	 * @param $tags			array of tag-names; might be null to get all existing tags
+	 * @param $only_ids		whether to return only the tag IDs (true) or tag names as well (false, default)
+	 * @return array		an array of the form array(array('id'=>.. , 'tag'=> ..), array('id'=>.. , 'tag'=> ..), ...) or array(1,2,3,..) if $only_ids==true
 	 */
 	public function get_existing_tags($tags = null, $only_ids = false)
 	{
@@ -419,14 +444,16 @@ class tags_manager
 	}
 
 	/**
-	 * Gets the topics which are tagged with any or all of the given $tags from all forums, where tagging is enabled and only those which the user is allowed to read.
+	 * Gets the topics which are tagged with any or all of the given $tags from
+	 * all forums, where tagging is enabled and only those which the user is
+	 * allowed to read.
 	 *
-	 * @param $start start for sql query
-	 * @param $limit limit for sql query
-	 * @param $tags array of tags to find the topics for
-	 * @param $mode AND=all tags must be assigned, OR=at least one tag needs to be assigned
-	 * @param $casesensitive wether the search should be casesensitive (true) or not (false).
-	 * @return array of topics, each containing all fields from TOPICS_TABLE
+	 * @param $start			start for sql query
+	 * @param $limit			limit for sql query
+	 * @param $tags				array of tags to find the topics for
+	 * @param $mode				AND=all tags must be assigned, OR=at least one tag needs to be assigned
+	 * @param $casesensitive	whether the search should be casesensitive (true) or not (false).
+	 * @return array of topics	each containing all fields from TOPICS_TABLE
 	 */
 	public function get_topics_by_tags(array $tags, $start, $limit, $mode = 'AND', $casesensitive = false)
 	{
@@ -437,12 +464,14 @@ class tags_manager
 	}
 
 	/**
-	 * Counts the topics which are tagged with any or all of the given $tags from all forums, where tagging is enabled and only those which the user is allowed to read.
+	 * Counts the topics which are tagged with any or all of the given $tags
+	 * from all forums, where tagging is enabled and only those which the user
+	 * is allowed to read.
 	 *
-	 * @param array $tags the tags to find the topics for
-	 * @param $mode AND(default)=all tags must be assigned, OR=at least one tag needs to be assigned
-	 * @param $casesensitive search case-sensitive if true, insensitive otherwise (default).
-	 * @return int count of topics found
+	 * @param array $tags		the tags to find the topics for
+	 * @param $mode				AND(default)=all tags must be assigned, OR=at least one tag needs to be assigned
+	 * @param $casesensitive	search case-sensitive if true, insensitive otherwise (default).
+	 * @return int				count of topics found
 	 */
 	public function count_topics_by_tags(array $tags, $mode = 'AND', $casesensitive = false)
 	{
@@ -459,9 +488,9 @@ class tags_manager
 	/**
 	 * Generates a sql_in_set depending on $casesensitive using tag or tag_lowercase.
 	 *
-	 * @param array $tags the tags to build the sql for
-	 * @param boolean $casesensitive whether to let the tags in place (true) or make them lower case (false)
-	 * @return string the sql in string depending on $casesensitive using tag or tag_lowercase
+	 * @param array $tags				the tags to build the SQL for
+	 * @param boolean $casesensitive	whether to leave the tags as-is (true) or make them lowercase (false)
+	 * @return string					the sql_in string depending on $casesensitive using tag or tag_lowercase
 	 */
 	private function sql_in_casesensitive_tag(array $tags, $casesensitive)
 	{
@@ -478,9 +507,9 @@ class tags_manager
 	}
 
 	/**
-	 * Gets the forum ids that the user is allowed to read.
+	 * Gets the forum IDs that the user is allowed to read.
 	 *
-	 * @return array forum ids that the user is allowed to read
+	 * @return array	forum ids that the user is allowed to read
 	 */
 	private function get_readable_forums()
 	{
@@ -500,9 +529,10 @@ class tags_manager
 	}
 
 	/**
-	 * Get sql-source for the topics that reside in forums that the user can read and which are approved.
+	 * Get SQL-query source for the topics that reside in forums that the user
+	 * can read and which are approved.
 	 *
-	 * @return string the generated sql
+	 * @return string	the generated SQL
 	 */
 	private function sql_where_topic_access()
 	{
@@ -521,12 +551,12 @@ class tags_manager
 	}
 
 	/**
-	 * Builds an sql query that selects all topics assigned with the tags depending on $mode and $casesensitive
+	 * Builds an SQL query that selects all topics assigned with the tags depending on $mode and $casesensitive
 	 *
-	 * @param $tags array of tags
-	 * @param $mode AND or OR
-	 * @param $casesensitive false or true
-	 * @return string 'SELECT topics.* FROM ' . TOPICS_TABLE . ' topics WHERE ' . [calculated where]
+	 * @param $tags				array of tags
+	 * @param $mode				AND or OR
+	 * @param $casesensitive	false or true
+	 * @return string			'SELECT topics.* FROM ' . TOPICS_TABLE . ' topics WHERE ' . [calculated where]
 	 */
 	public function get_topics_build_query(array $tags, $mode = 'AND', $casesensitive = false)
 	{
@@ -584,7 +614,7 @@ class tags_manager
 	 * Checks whether the given tag is blacklisted.
 	 *
 	 * @param string $tag
-	 * @return boolean true, if the tag is on the blacklist, false otherwise
+	 * @return boolean		true, if the tag is on the blacklist, false otherwise
 	 */
 	private function is_on_blacklist($tag)
 	{
@@ -603,7 +633,7 @@ class tags_manager
 	 * Checks whether the given tag is whitelisted.
 	 *
 	 * @param string $tag
-	 * @return boolean true, if the tag is on the whitelist, false otherwise
+	 * @return boolean		true, if the tag is on the whitelist, false otherwise
 	 */
 	private function is_on_whitelist($tag)
 	{
@@ -629,9 +659,9 @@ class tags_manager
 	 * Checks if the given tag matches the configured regex for valid tags, Note that the tag is trimmed to 30 characters before the check!
 	 * This method also checks if the tag is whitelisted and/or blacklisted if the lists are enabled.
 	 *
-	 * @param $tag the tag to check
-	 * @param $is_clean wether the tag has already been cleaned or not.
-	 * @return true if the tag matches, false otherwise
+	 * @param $tag			the tag to check
+	 * @param $is_clean		whether the tag has already been cleaned or not.
+	 * @return				true if the tag matches, false otherwise
 	 */
 	public function is_valid_tag($tag, $is_clean = false)
 	{
@@ -683,8 +713,8 @@ class tags_manager
 	/**
 	 * Splits the given tags into valid and invalid ones.
 	 *
-	 * @param $tags an array of potential tags
-	 * @return array array('valid'=> array(), 'invalid' => array())
+	 * @param $tags		an array of potential tags
+	 * @return array	array('valid'=> array(), 'invalid' => array())
 	 */
 	public function split_valid_tags($tags)
 	{
@@ -704,8 +734,8 @@ class tags_manager
 	/**
 	 * Trims the tag to 30 characters and replaced spaces to "-" if configured.
 	 *
-	 * @param the tag to clean
-	 * @return cleaned tag
+	 * @param	the tag to clean
+	 * @return	cleaned tag
 	 */
 	public function clean_tag($tag)
 	{
@@ -728,8 +758,8 @@ class tags_manager
 	/**
 	 * Checks if tagging is enabled in the given forum.
 	 *
-	 * @param $forum_id the id of the forum
-	 * @return true if tagging is enabled in the given forum, false if not
+	 * @param $forum_id		the id of the forum
+	 * @return				true if tagging is enabled in the given forum, false if not
 	 */
 	public function is_tagging_enabled_in_forum($forum_id)
 	{
@@ -744,7 +774,7 @@ class tags_manager
 	/**
 	 * Enables tagging engine in all forums (not categories and links).
 	 *
-	 * @return number of affected forums (should be the count of all forums (type FORUM_POST ))
+	 * @return	number of affected forums (should be the count of all forums (type FORUM_POST ))
 	 */
 	public function enable_tags_in_all_forums()
 	{
@@ -754,8 +784,8 @@ class tags_manager
 	/**
 	 * en/disables tagging engine in all forums (not categories and links).
 	 *
-	 * @param boolean $enable true to enable and false to disabl the engine
-	 * @return number of affected forums (should be the count of all forums (type FORUM_POST ))
+	 * @param boolean $enable	true to enable and false to disabl the engine
+	 * @return					number of affected forums (should be the count of all forums (type FORUM_POST ))
 	 */
 	private function set_tags_enabled_in_all_forums($enable)
 	{
@@ -775,7 +805,7 @@ class tags_manager
 	/**
 	 * Disables tagging engine in all forums (not categories and links).
 	 *
-	 * @return number of affected forums (should be the count of all forums (type FORUM_POST ))
+	 * @return	number of affected forums (should be the count of all forums (type FORUM_POST ))
 	 */
 	public function disable_tags_in_all_forums()
 	{
@@ -785,8 +815,8 @@ class tags_manager
 	/**
 	 * Checks if all forums have the given status of the tagging engine (enabled/disabled)
 	 *
-	 * @param boolean $status true to check for enabled, false to check for disabled engine
-	 * @return boolean true if for all forums tagging is in state $status
+	 * @param boolean $status	true to check for enabled, false to check for disabled engine
+	 * @return boolean			true if for all forums tagging is in state $status
 	 */
 	private function is_status_in_all_forums($status)
 	{
@@ -807,7 +837,7 @@ class tags_manager
 	/**
 	 * Checks if tagging is enabled or for all forums (not categories and links).
 	 *
-	 * @return true if for all forums tagging is enabled (type FORUM_POST ))
+	 * @return	true if for all forums tagging is enabled (type FORUM_POST ))
 	 */
 	public function is_enabled_in_all_forums()
 	{
@@ -817,7 +847,7 @@ class tags_manager
 	/**
 	 * Checks if tagging is disabled or for all forums (not categories and links).
 	 *
-	 * @return true if for all forums tagging is disabled (type FORUM_POST ))
+	 * @return	true if for all forums tagging is disabled (type FORUM_POST ))
 	 */
 	public function is_disabled_in_all_forums()
 	{
@@ -862,8 +892,8 @@ class tags_manager
 	/**
 	 * Gets the topic-ids that the given tag-id is assigned to.
 	 *
-	 * @param int $tag_id the id of the tag
-	 * @return array array of ints (the topic-ids)
+	 * @param int $tag_id	the id of the tag
+	 * @return array		array of ints (the topic-ids)
 	 */
 	private function get_topic_ids_by_tag_id($tag_id)
 	{
@@ -882,10 +912,10 @@ class tags_manager
 	 * Merges two tags, by assigning all topics of tag_to_delete_id to the tag_to_keep_id and then deletes the tag_to_delete_id.
 	 * NOTE: Both tags must exist and this is not checked again!
 	 *
-	 * @param int $tag_to_delete_id the id of the tag to delete
-	 * @param string $tag_to_keep must be valid
-	 * @param int $tag_to_keep_id the id of the tag to keep
-	 * @return the new count of assignments of the kept tag
+	 * @param int $tag_to_delete_id		the id of the tag to delete
+	 * @param string $tag_to_keep		must be valid
+	 * @param int $tag_to_keep_id		the id of the tag to keep
+	 * @return							the new count of assignments of the kept tag
 	 */
 	public function merge($tag_to_delete_id, $tag_to_keep, $tag_to_keep_id)
 	{
@@ -934,9 +964,9 @@ class tags_manager
 	/**
 	 * Renames the tag
 	 *
-	 * @param int $tag_id the id of the tag
-	 * @param string $new_name_clean the new name of the tag already cleaned
-	 * @return int the count of topics that are assigned to the tag
+	 * @param int $tag_id				the id of the tag
+	 * @param string $new_name_clean	the new name of the tag already cleaned
+	 * @return int						the count of topics that are assigned to the tag
 	 */
 	public function rename($tag_id, $new_name_clean)
 	{
@@ -954,8 +984,8 @@ class tags_manager
 	/**
 	 * Gets the corresponding tag by its id
 	 *
-	 * @param int $tag_id the id of the tag
-	 * @return string the tag name
+	 * @param int $tag_id	the id of the tag
+	 * @return string		the tag name
 	 */
 	public function get_tag_by_id($tag_id)
 	{
@@ -970,16 +1000,121 @@ class tags_manager
 		return $this->db_helper->get_field($sql, 'tag', 1);
 	}
 
+    /**
+     * Sorts an array of tags based on language-specific and case-sensitive/natural sorting.
+     * 
+     * @param array $tagslist		The list of tags to be sorted.
+     * @param bool $casesensitive	Whether to perform case-sensitive sorting.
+     * @return array				The sorted tagslist.
+     */
+	public function sort_tags($tagslist, $casesensitive = false)
+	{
+		/* By default, this extension defers to the current system
+		   language_locale.charset alphabetization rules. Instead, you can set
+		   something specific here, e.g. 'en_US.UTF-8', to conform sorting to a
+		   particular language and country's norms. This might be needed in a
+		   case of mismatch between server configuration and target audience,
+		   like running a German board on a shared hosting provider in Sweden.
+		   BE SURE that your system supports the localization you choose!
+		   
+		   We cannot use phpBB variables like $user_lang_name or S_USER_LANG
+		   because thos are simplifications like "en", not PHP-understood
+		   localization names.
+		*/
+		// Save the current locale before changing it:
+		$original_locale = setlocale(LC_COLLATE, 0);
+		// 0 (WITHOUT quotation marks!) gets the current locale setting.
+
+		setlocale(LC_COLLATE, '0');
+		// Note the quotation marks this time.
+		// Or specify a locale in place of '0'; ensure your system supports it! 
+		
+		// If someone has changed '0' above to something specific, we need to
+		// check that the locale was actually set successfully since some of
+		// the locale strings are complicated and someone might get one wrong.
+		if (!$original_locale) {
+			// Locale wasn't set successfully, so handle this case.
+			// First log it:
+			error_log("RH Topic Tags (tags_manager.php): Locale setting '$original_locale' failed. Falling back to default locale.");
+			// Now set it back to system default:
+			setlocale(LC_COLLATE, '0');
+		}
+
+		// Determine which field to use based on the value of $casesensitive:
+		if ($casesensitive) {
+			$tag_field = 'tag';  // "Official" tag names as saved in the db.
+		} else {
+			$tag_field = 'tag_lowercase';  // Db already has LC version, too.
+		}
+
+		// Perform both language-specific sorting (via strcoll) and
+		// natural numeric sorting (via strnatcasecmp) in one pass:
+		usort($tagslist, function($a, $b) use ($tag_field) {
+
+			// First, compare alphabetically with language-specific collation
+			// (by setlocale localization above); store result in a variable:
+			$collationResult = strcoll($a[$tag_field], $b[$tag_field]);
+
+			// If alphabetically equal (strcoll returns 0), use human-friendly
+			// "natural" sorting for numeric parts; replace values in variable:
+			if ($collationResult === 0) {
+				$collationResult = strnatcasecmp($a[$tag_field], $b[$tag_field]);
+			}
+
+        return $collationResult;
+		});
+
+		// Restore the original locale after sorting:
+		setlocale(LC_COLLATE, $original_locale);
+		// We do this because that's a global setting and various other things
+		// may be making use of this in different ways.
+
+		return $tagslist;
+
+		/* Closing notes: 
+		
+		   strcoll() is used because it is specifically designed to perform
+		   a string comparison according to the current locale, respecting
+		   language/regional rules for alphabetizing strings, including
+		   handling special characters (like diacritics), case differences,
+		   and other variations in string order. E.g. the alphabetization
+		   of ö is different between German and Swedish.
+
+		   In cases where setlocale() fails or cannot be set to a desired
+		   locale, we could potentially fallback to strnatcasecmp() in place
+		   of strcoll(), though this would not have the nuances of the latter's
+		   language-specific collation. This would be some work, so will not
+		   be implemented without clear demand for it.
+		   
+		   Also, it is worth noting here that the sorting is being performed on
+		   the tags alone (in their original mixed-case form or their lower-
+		   case normalized form), and the relationship of tag name to ID
+		   number and other elements in the array will remain intact as the
+		   array is reordered.
+
+		   Finally, an attempt was made to use PHP Collation to perform the
+		   sorting, which is superior even to strcoll(). But this just produced
+		   Server 500 errors, so phpBB or the underlying PHP installation is
+		   not working with this. Even if it's a local-config problem, we can't
+		   depend on this newer approach being available. It might be possible
+		   to test for it and use it if usable and fall back to strcoll() if
+		   not, but so far any attempt to use it at all causes 500 error. It's
+		   also not practicable to have the database itself do the collating
+		   via the SQL query that retrieve the tags, since the collation
+		   names between MySQL, PostreSQL, etc., are not in agreement.
+		*/
+	}
+
 	/**
 	 * Gets all tags.
 	 *
-	 * @param $start start for sql query
-	 * @param $limit limit for sql query
-	 * @param $sort_field the db field to order by
-	 * @param $asc order direction (true == asc, false == desc)
-	 * @return array array of tags
+	 * @param $start		start for sql query
+	 * @param $limit		limit for sql query
+	 * @param $sort_field	the db field to order by
+	 * @param $asc			order direction (true == asc, false == desc)
+	 * @return array		array of tags
 	 */
-	public function get_all_tags($start, $limit, $sort_field = 'tag', $asc = true)
+	public function get_all_tags($start, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false)
 	{
 		switch ($sort_field)
 		{
@@ -1000,7 +1135,14 @@ class tags_manager
 			'tag_lowercase',
 			'count'
 		);
-		return $this->db_helper->get_multiarray_by_fieldnames($sql, $field_names, $limit, $start);
+		// Fetch the tags from the database:
+		$tagslist = $this->db_helper->get_multiarray_by_fieldnames($sql, $field_names, $limit, $start);
+
+		// Run the array of tags through the sorter:
+		$sortedTags = $this->sort_tags($tagslist, $casesensitive);
+
+		// Return the sorted tags list
+		return $sortedTags;
 	}
 
 	/**
