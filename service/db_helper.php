@@ -97,9 +97,11 @@ class db_helper
 	 */
 	public function get_array($sql, $limit = 0, $start = 0)
 	{
-		$result = $limit > 0
-			? $this->db->sql_query_limit($sql, $limit, $start)
-			: $this->db->sql_query($sql);
+		if ($limit > 0) {
+			$result = $this->db->sql_query_limit($sql, $limit, $start);
+		} else {
+			$result = $this->db->sql_query($sql);
+		}
 		$re = array();
 		while ($row = $this->db->sql_fetchrow($result))
 		{
@@ -124,9 +126,11 @@ class db_helper
 	 */
 	public function get_multiarray_by_fieldnames($sql, array $field_names, $limit = 0, $start = 0)
 	{
-		$result = $limit > 0
-			? $this->db->sql_query_limit($sql, $limit, $start)
-			: $this->db->sql_query($sql);
+		if ($limit > 0) {
+			$result = $this->db->sql_query_limit($sql, $limit, $start);
+		} else {
+			$result = $this->db->sql_query($sql);
+		}
 		$re = array();
 		while ($row = $this->db->sql_fetchrow($result))
 		{
@@ -156,9 +160,11 @@ class db_helper
 	 */
 	public function get_field($sql, $field_name, $limit = 0, $start = 0)
 	{
-		$result = $limit > 0
-			? $this->db->sql_query_limit($sql, $limit, $start)
-			: $this->db->sql_query($sql);
+		if ($limit > 0) {
+			$result = $this->db->sql_query_limit($sql, $limit, $start);
+		} else {
+			$result = $this->db->sql_query($sql);
+		}
 		$re = $this->db->sql_fetchfield($field_name);
 		$this->db->sql_freeresult($result);
 		return $re;
