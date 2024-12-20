@@ -14,6 +14,7 @@ namespace robertheim\topictags\service;
  */
 use robertheim\topictags\tables;
 use robertheim\topictags\prefixes;
+use robertheim\topictags\service\tags_manager;
 
 /**
 * Handles all operations regarding the tag cloud.
@@ -38,13 +39,17 @@ class tagcloud_manager
 	/** @var string */
 	private $table_prefix;
 
+	/** @var tags_manager */
+	private $tags_manager;
+
 	public function __construct(
 		\phpbb\db\driver\driver_interface $db,
 		\phpbb\config\config $config,
 		\phpbb\template\template $template,
 		\phpbb\user $user,
 		\phpbb\controller\helper $helper,
-		$table_prefix
+		$table_prefix,
+		tags_manager $tags_manager
 	)
 	{
 		$this->db = $db;
@@ -53,34 +58,41 @@ class tagcloud_manager
 		$this->user = $user;
 		$this->helper = $helper;
 		$this->table_prefix = $table_prefix;
+		$this->tags_manager = $tags_manager;
 	}
 
 	/**
 	 * Assigns all required data for the tag cloud to the template so that
 	 * including tagcloud.html can display the tag cloud.
-	 * @param $limit	The limit for assigned tags. If 0 (default), the config limit is used; if $limit <= -1 all tags will be shown; $limit otherwise.
+	 * @param $maxtags	The maximum number of assigned tags to display. If 0 (default), the config limit is used; if $maxtags <= -1 all tags will be shown; $maxtags otherwise.
 	 */
-	public function assign_tagcloud_to_template($limit = 0)
+	public function assign_tagcloud_to_template($maxtags = 0)
 	{
-		if (0 == $limit)
-		{
-			$limit = $this->config[prefixes::CONFIG . '_max_tags_in_tagcloud'];
+		// Default value handling
+		if (0 == $maxtags) {
+			$maxtags = $this->config[prefixes::CONFIG . '_max_tags_in_tagcloud'];
 		}
 
 		// Get the data.
-		// When $limit is still 0, no tags should be displayed.
-		$tags = (0 == $limit) ? array() : $this->get_top_tags($limit);
+		// When $maxtags is still 0, no tags should be displayed.
+		if (0 == $maxtags) {
+			$tags = array();
+		} else {
+			$tags = $this->get_top_tags($maxtags);
+		}
+
 		$maximum = $this->get_maximum_tag_usage_count();
 
 		$result_size = sizeof($tags);
-		if ($result_size < $limit)
-		{
-			$limit = $result_size;
+		if ($result_size < $maxtags) {
+			$maxtags = $result_size;
 		}
 
-		$show_count = ($limit <= -1)
-			? $this->user->lang('RH_TOPICTAGS_DISPLAYING_TOTAL_ALL')
-			: $show_count = $this->user->lang('RH_TOPICTAGS_DISPLAYING_TOTAL', $limit);
+		if ($maxtags <= -1) {
+			$show_count = $this->user->lang('RH_TOPICTAGS_DISPLAYING_TOTAL_ALL');
+		} else {
+			$show_count = $this->user->lang('RH_TOPICTAGS_DISPLAYING_TOTAL', $maxtags);
+		}
 
 		// Ensure that the CSS for the tag cloud will be included:
 		$this->template->assign_vars(array(
@@ -89,13 +101,12 @@ class tagcloud_manager
 			'RH_TOPICTAGS_TAGCLOUD_TAG_COUNT'	=> $show_count,
 		));
 
-		// Display it:
-		foreach ($tags as $tag)
-		{
+		// Display the tag cloud:
+		foreach ($tags as $tag) {
 			$css_class = $this->get_css_class($tag['count'], $maximum);
 			$link = $this->helper->route('robertheim_topictags_show_tag_controller', array(
-						'tags'	=> urlencode($tag['tag'])
-					));
+				'tags'	=> urlencode($tag['tag'])
+			));
 
 			$this->template->assign_block_vars('rh_topictags_tags', array(
 				'NAME'		=> $tag['tag'],
@@ -107,16 +118,15 @@ class tagcloud_manager
 	}
 
 	/**
-	 * Gets the most-used tags, up to $limit (if positive).
+	 * Gets the most-used tags, up to $maxtags (if positive).
 	 *
-	 * @param $limit	max results, gets all tags if <1
+	 * @param $maxtags	maximum number of results, gets all tags if <1
 	 * @return array	(array('tag' => string, 'count' => int), ...)
 	 */
-	public function get_top_tags($limit)
+	public function get_top_tags($maxtags)
 	{
 		$where = '';
-		if ($limit > 0)
-		{
+		if ($maxtags > 0) {
 			$where = 't.count > 0';
 		}
 		$sql_array = array(
@@ -128,12 +138,13 @@ class tagcloud_manager
 			'ORDER_BY'	=> 't.count DESC',
 		);
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
-		$result = ($limit > 0)
-			? $result = $this->db->sql_query_limit($sql, (int) $limit)
-			: $result = $this->db->sql_query($sql);
+		if ($maxtags > 0) {
+			$result = $this->db->sql_query_limit($sql, (int) $maxtags);
+		} else {
+			$result = $this->db->sql_query($sql);
+		}
 		$tags = array();
-		while ($row = $this->db->sql_fetchrow($result))
-		{
+		while ($row = $this->db->sql_fetchrow($result)) {
 			$tags[] = array(
 				'tag'	=> $row['tag'],
 				'count'	=> $row['count']
@@ -174,13 +185,11 @@ class tagcloud_manager
 	private function get_css_class($count, $maximum)
 	{
 		$percent = 50;
-		if (0 < $maximum)
-		{
+		if (0 < $maximum) {
 			$percent = floor(($count / $maximum) * 100);
 		}
 
-		switch (true)
-		{
+		switch (true) {
 			case $percent < 20:
 				return 'rh_topictags_smallest';
 			case $percent < 40:

@@ -50,7 +50,7 @@ class tagcloud_manager_test extends \phpbb_database_test_case
 			->disableOriginalConstructor()
 			->getMock();
 
-		$this->tagcloud_manager = new tagcloud_manager($this->db, $config, $this->template, $this->user, $this->helper, $table_prefix);
+		$this->tagcloud_manager = new tagcloud_manager($this->db, $config, $this->template, $this->user, $this->helper, $table_prefix, $tags_manager);
 	}
 
 	public function getDataSet()
