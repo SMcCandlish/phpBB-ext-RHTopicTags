@@ -73,13 +73,17 @@ class tagcloud_manager
 			$maxtags = $this->config[prefixes::CONFIG . '_max_tags_in_tagcloud'];
 		}
 
-		// Get the data.
+		// Get the data via get_top_tags(), which abstracts fetching/processing
 		// When $maxtags is still 0, no tags should be displayed.
 		if (0 == $maxtags) {
 			$tags = array();
 		} else {
 			$tags = $this->get_top_tags($maxtags);
-		}
+		} //This script uses "Yoda order" in `if $0 == $maxtags` to avoid
+		  // silently zeroing the value of the variable, in the event a later
+		  // edit of this code accidentally used `=` in place of `==`.
+		  // Instead of that happening almost undetectably, an error would
+		  // be thrown. */
 
 		$maximum = $this->get_maximum_tag_usage_count();
 
@@ -202,4 +206,5 @@ class tagcloud_manager
 				return 'rh_topictags_largest';
 		}
 	}
+
 }
