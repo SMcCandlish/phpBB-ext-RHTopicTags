@@ -82,8 +82,7 @@ class tags_manager
 		$sql = 'DELETE FROM ' . $this->table_prefix . tables::TOPICTAGS. '
 			WHERE ' . $this->db->sql_in_set('topic_id', $topic_ids);
 		$this->db->sql_query($sql);
-		if ($delete_unused_tags)
-		{
+		if ($delete_unused_tags) {
 			$this->delete_unused_tags();
 		}
 		$this->calc_count_tags();
@@ -112,8 +111,7 @@ class tags_manager
 	public function delete_unused_tags()
 	{
 		$ids = $this->get_unused_tag_ids();
-		if (empty($ids))
-		{
+		if (empty($ids)) {
 			// nothing to do
 			return 0;
 		}
@@ -134,15 +132,12 @@ class tags_manager
 		$tags = $this->get_existing_tags(null);
 
 		$ids_of_invalid_tags = array();
-		foreach ($tags as $tag)
-		{
-			if (!$this->is_valid_tag($tag['tag']))
-			{
+		foreach ($tags as $tag) {
+			if (!$this->is_valid_tag($tag['tag'])) {
 				$ids_of_invalid_tags[] = (int) $tag['id'];
 			}
 		}
-		if (empty($ids_of_invalid_tags))
-		{
+		if (empty($ids_of_invalid_tags)) {
 			// nothing to do
 			return 0;
 		}
@@ -183,8 +178,7 @@ class tags_manager
 	public function delete_assignments_where_topic_does_not_exist()
 	{
 		$ids = $this->get_assignment_ids_where_topic_does_not_exist();
-		if (empty($ids))
-		{
+		if (empty($ids)) {
 			// nothing to do
 			return 0;
 		}
@@ -209,10 +203,8 @@ class tags_manager
 	{
 		$forums_sql_where = '';
 
-		if (is_array($forum_ids))
-		{
-			if (empty($forum_ids))
-			{
+		if (is_array($forum_ids)) {
+			if (empty($forum_ids)) {
 				// Performance improvement, because we already know the result of querying the db.
 				return 0;
 			}
@@ -233,8 +225,7 @@ class tags_manager
 			)";
 		$delete_ids = $this->db_helper->get_ids($sql);
 
-		if (empty($delete_ids))
-		{
+		if (empty($delete_ids)) {
 			// nothing to do
 			return 0;
 		}
@@ -297,20 +288,18 @@ class tags_manager
 	 */
 	public function get_tag_suggestions($query, $exclude, $count)
 	{
-		if (utf8_strlen($query) < 3)
-		{
+		if (utf8_strlen($query) < 3) {
 			return array();
 		}
 		$exclude_sql = '';
-		if (!empty($exclude))
-		{
+		if (!empty($exclude)) {
 			$exclude_sql = ' AND ' . $this->db->sql_in_set('t.tag', $exclude, true, true);
 		}
 		$sql_array = array(
 			// we must fetch count, because postgres needs the context for ordering
 			'SELECT'	=> 't.tag, t.count',
 			'FROM'		=> array(
-				$this->table_prefix . tables::TAGS		=> 't',
+				$this->table_prefix . tables::TAGS => 't',
 			),
 			'WHERE'		=> 't.tag ' . $this->db->sql_like_expression($query . $this->db->get_any_char()) . "
 							$exclude_sql",
@@ -319,8 +308,7 @@ class tags_manager
 		$sql = $this->db->sql_build_query('SELECT_DISTINCT', $sql_array);
 		$result = $this->db->sql_query_limit($sql, $count);
 		$tags = array();
-		while ($row = $this->db->sql_fetchrow($result))
-		{
+		while ($row = $this->db->sql_fetchrow($result)) {
 			$tags[] = array('text' => $row['tag']);
 		}
 		$this->db->sql_freeresult($result);
@@ -345,8 +333,7 @@ class tags_manager
 
 		// create topic_id <-> tag_id link in TOPICTAGS_TABLE
 		$sql_ary = array();
-		foreach ($ids as $id)
-		{
+		foreach ($ids as $id) {
 			$sql_ary[] = array(
 				'topic_id'	=> $topic_id,
 				'tag_id'	=> $id
@@ -377,10 +364,8 @@ class tags_manager
 
 		// find all tags that are not in $existing_tags and add them to $sql_ary_new_tags
 		$sql_ary_new_tags = array();
-		foreach ($tags as $tag)
-		{
-			if (!$this->in_array_r($tag, $existing_tags))
-			{
+		foreach ($tags as $tag) {
+			if (!$this->in_array_r($tag, $existing_tags)) {
 				// tag needs to be created
 				$sql_ary_new_tags[] = array(
 					'tag'			=> $tag,
@@ -430,15 +415,13 @@ class tags_manager
 	 *
 	 * @param $tags			array of tag-names; might be null to get all existing tags
 	 * @param $only_ids		whether to return only the tag IDs (true) or tag names as well (false, default)
-	 * @return array		an array of the form array(array('id'=>.. , 'tag'=> ..), array('id'=>.. , 'tag'=> ..), ...) or array(1,2,3,..) if $only_ids==true
+	 * @return array		an array of the form array(array('id' => ... , 'tag' => ...), array('id' => ... , 'tag' => ...), ...) or array(1,2,3,...) if $only_ids == true
 	 */
 	public function get_existing_tags($tags = null, $only_ids = false)
 	{
 		$where = '';
-		if (!is_null($tags))
-		{
-			if (empty($tags))
-			{
+		if (!is_null($tags)) {
+			if (empty($tags)) {
 				// ensure that empty input array results in empty output array.
 				// note that this case is different from $tags == null where we want to get ALL existing tags.
 				return array();
@@ -448,8 +431,7 @@ class tags_manager
 		$sql = 'SELECT id, tag
 			FROM ' . $this->table_prefix . tables::TAGS . "
 			$where";
-		if ($only_ids)
-		{
+		if ($only_ids) {
 			return $this->db_helper->get_ids($sql);
 		}
 		return $this->db_helper->get_multiarray_by_fieldnames($sql, array(
@@ -492,8 +474,7 @@ class tags_manager
 	 */
 	public function count_topics_by_tags(array $tags, $mode = 'AND', $casesensitive = false)
 	{
-		if (empty($tags))
-		{
+		if (empty($tags)) {
 			return 0;
 		}
 		$sql = $this->get_topics_build_query($tags, $mode, $casesensitive);
@@ -512,15 +493,18 @@ class tags_manager
 	private function sql_in_casesensitive_tag(array $tags, $casesensitive)
 	{
 		$tags_copy = $tags;
-		if (!$casesensitive)
-		{
+		if (!$casesensitive) {
 			$tag_count = sizeof($tags_copy);
 			for ($i = 0; $i < $tag_count; $i++)
 			{
 				$tags_copy[$i] = utf8_strtolower($tags_copy[$i]);
 			}
 		}
-		return $this->db->sql_in_set($casesensitive ? ' t.tag' : 't.tag_lowercase', $tags_copy);
+		if ($casesensitive) {
+			return $this->db->sql_in_set(' t.tag', $tags_copy);
+		} else {
+			return $this->db->sql_in_set('t.tag_lowercase', $tags_copy);
+		}
 	}
 
 	/**
@@ -532,10 +516,8 @@ class tags_manager
 	{
 		$forum_ary = array();
 		$forum_read_ary = $this->auth->acl_getf('f_read');
-		foreach ($forum_read_ary as $forum_id => $allowed)
-		{
-			if ($allowed['f_read'])
-			{
+		foreach ($forum_read_ary as $forum_id => $allowed) {
+			if ($allowed['f_read']) {
 				$forum_ary[] = (int) $forum_id;
 			}
 		}
@@ -555,12 +537,9 @@ class tags_manager
 	{
 		$forum_ary = $this->get_readable_forums();
 		$sql_where_topic_access = '';
-		if (empty($forum_ary))
-		{
+		if (empty($forum_ary)) {
 			$sql_where_topic_access = ' 1=0 ';
-		}
-		else
-		{
+		} else {
 			$sql_where_topic_access = $this->db->sql_in_set('topics.forum_id', $forum_ary, false, true);
 		}
 		$sql_where_topic_access .= ' AND topics.topic_visibility = ' . ITEM_APPROVED;
@@ -577,8 +556,7 @@ class tags_manager
 	 */
 	public function get_topics_build_query(array $tags, $mode = 'AND', $casesensitive = false)
 	{
-		if (empty($tags))
-		{
+		if (empty($tags)) {
 			return 'SELECT topics.* FROM ' . TOPICS_TABLE . ' topics WHERE 0=1';
 		}
 
@@ -590,8 +568,7 @@ class tags_manager
 		$sql_where_tag_in = $this->sql_in_casesensitive_tag($tags, $casesensitive);
 		$sql_where_topic_access = $this->sql_where_topic_access();
 		$sql = '';
-		if ('AND' == $mode)
-		{
+		if ('AND' == $mode) {
 			$tag_count = sizeof($tags);
 			// http://stackoverflow.com/questions/26038114/sql-select-distinct-where-exist-row-for-each-id-in-other-table
 			$sql = 'SELECT topics.*
@@ -605,9 +582,7 @@ class tags_manager
 					AND $sql_where_topic_access
 				GROUP BY topics.topic_id
 				HAVING count(t.id) = $tag_count";
-		}
-		else
-		{
+		} else {
 			// OR mode, we produce: AND t.tag IN ('tag1', 'tag2', ...)
 			$sql_array = array(
 				'SELECT'	=> 'topics.*',
@@ -638,10 +613,8 @@ class tags_manager
 	private function is_on_blacklist($tag)
 	{
 		$blacklist = json_decode($this->config_text->get(prefixes::CONFIG.'_blacklist'), true);
-		foreach ($blacklist as $entry)
-		{
-			if ($tag === $this->clean_tag($entry))
-			{
+		foreach ($blacklist as $entry) {
+			if ($tag === $this->clean_tag($entry)) {
 				return true;
 			}
 		}
@@ -657,10 +630,8 @@ class tags_manager
 	private function is_on_whitelist($tag)
 	{
 		$whitelist = $this->get_whitelist_tags();
-		foreach ($whitelist as $entry)
-		{
-			if ($tag === $this->clean_tag($entry))
-			{
+		foreach ($whitelist as $entry) {
+			if ($tag === $this->clean_tag($entry)) {
 				return true;
 			}
 		}
@@ -684,16 +655,14 @@ class tags_manager
 	 */
 	public function is_valid_tag($tag, $is_clean = false)
 	{
-		if (!$is_clean)
-		{
+		if (!$is_clean) {
 			$tag = $this->clean_tag($tag);
 		}
 
 		$pattern = $this->config[prefixes::CONFIG.'_allowed_tags_regex'];
 		$tag_is_valid = preg_match($pattern, $tag);
 
-		if (!$tag_is_valid)
-		{
+		if (!$tag_is_valid) {
 			// non conform to regex is always invalid.
 			return false;
 		}
@@ -701,23 +670,19 @@ class tags_manager
 		// from here on: tag is regex conform
 
 		// check blacklist
-		if ($this->config[prefixes::CONFIG.'_blacklist_enabled'])
-		{
-			if ($this->is_on_blacklist($tag))
-			{
+		if ($this->config[prefixes::CONFIG.'_blacklist_enabled']) {
+			if ($this->is_on_blacklist($tag)) {
 				// tag is regex-conform, but blacklisted => invalid
 				return false;
 			}
-			// regex conform and not blacklisted. => do nothing here
+			// regex conform and not blacklisted => do nothing here
 		}
 
 		// here we know: tag is regex conform and not blacklisted or it's regex conform and the blacklist is disabled.
 
 		// check whitelist
-		if ($this->config[prefixes::CONFIG.'_whitelist_enabled'])
-		{
-			if ($this->is_on_whitelist($tag))
-			{
+		if ($this->config[prefixes::CONFIG.'_whitelist_enabled']) {
+			if ($this->is_on_whitelist($tag)) {
 				// tag is regex-conform not blacklisted and in the whitelist => valid
 				return true;
 			}
@@ -733,18 +698,21 @@ class tags_manager
 	 * Splits the given tags into valid and invalid ones.
 	 *
 	 * @param $tags		an array of potential tags
-	 * @return array	array('valid'=> array(), 'invalid' => array())
+	 * @return array	array('valid' => array(), 'invalid' => array())
 	 */
 	public function split_valid_tags($tags)
 	{
 		$re = array(
-			'valid' => array(),
-			'invalid' => array()
+			'valid'		=> array(),
+			'invalid'	=> array()
 		);
-		foreach ($tags as $tag)
-		{
+		foreach ($tags as $tag) {
 			$tag = $this->clean_tag($tag);
-			$type = $this->is_valid_tag($tag, true) ? 'valid' : 'invalid';
+			if ($this->is_valid_tag($tag, true)) {
+				$type = 'valid';
+			} else {
+				$type = 'invalid';
+			}
 			$re[$type][] = $tag;
 		}
 		return $re;
@@ -766,8 +734,7 @@ class tags_manager
 		// might have a space at the end now, so trim again
 		$tag = trim($tag);
 
-		if ($this->config[prefixes::CONFIG.'_convert_space_to_minus'])
-		{
+		if ($this->config[prefixes::CONFIG.'_convert_space_to_minus']) {
 			$tag = str_replace(' ', '-', $tag);
 		}
 
@@ -808,13 +775,27 @@ class tags_manager
 	 */
 	private function set_tags_enabled_in_all_forums($enable)
 	{
-		$sql_ary =  array(
-			'rh_topictags_enabled'	=> $enable ? 1 : 0
+		if ($enable) {
+			$rh_topictags_enabled_value = 1;
+		} else {
+			$rh_topictags_enabled_value = 0;
+		}
+		
+		$sql_ary = array(
+			'rh_topictags_enabled' => $rh_topictags_enabled_value
 		);
+		
+		if ($enable) {
+			$rh_topictags_enabled_condition = '0';
+		} else {
+			$rh_topictags_enabled_condition = '1';
+		}
+
 		$sql = 'UPDATE ' . FORUMS_TABLE . '
 			SET ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
 			WHERE forum_type = ' . FORUM_POST . '
-				AND rh_topictags_enabled = ' . ($enable ? '0' : '1');
+				AND rh_topictags_enabled = ' . $rh_topictags_enabled_condition;
+		
 		$this->db->sql_query($sql);
 		$affected_rows = $this->db->sql_affectedrows();
 		$this->calc_count_tags();
@@ -839,15 +820,21 @@ class tags_manager
 	 */
 	private function is_status_in_all_forums($status)
 	{
-		// there exist any which are disabled => is_enabled_in_all_forums == false
+		if ($status) {
+			$rh_topictags_enabled_value = '0';
+		} else {
+			$rh_topictags_enabled_value = '1';
+		}
+
 		$sql_array = array(
 			'SELECT'	=> 'COUNT(*) as all_not_in_status',
 			'FROM'		=> array(
 				FORUMS_TABLE => 'f',
 			),
-			'WHERE'		=> 'f.rh_topictags_enabled = ' . ($status? '0' : '1') . '
+			'WHERE'		=> 'f.rh_topictags_enabled = ' . $rh_topictags_enabled_value . '
 				AND forum_type = ' . FORUM_POST,
-		);
+		); // If any are disabled is_enabled_in_all_forums() will return false.
+		
 		$sql = $this->db->sql_build_query('SELECT', $sql_array);
 		$all_not_in_status = (int) $this->db_helper->get_field($sql, 'all_not_in_status');
 		return $all_not_in_status == 0;
@@ -881,14 +868,13 @@ class tags_manager
 		$sql_array = array(
 			'SELECT'	=> 'id',
 			'FROM'		=> array(
-				$this->table_prefix . tables::TAGS		=> 't',
+				$this->table_prefix . tables::TAGS => 't',
 			),
 		);
 		$sql = $this->db->sql_build_query('SELECT_DISTINCT', $sql_array);
 		$tag_ids = $this->db->sql_query($sql);
 
-		while ($tag = $this->db->sql_fetchrow($tag_ids))
-		{
+		while ($tag = $this->db->sql_fetchrow($tag_ids)) {
 			$tag_id = $tag['id'];
 			$sql = 'SELECT COUNT(tt.id) as count
 				FROM ' . TOPICS_TABLE . ' topics,
@@ -919,7 +905,7 @@ class tags_manager
 		$sql_array = array(
 			'SELECT'	=> 'tt.topic_id',
 			'FROM'		=> array(
-				$this->table_prefix . tables::TOPICTAGS	=> 'tt',
+				$this->table_prefix . tables::TOPICTAGS => 'tt',
 			),
 			'WHERE'		=> 'tt.tag_id = ' . ((int) $tag_id),
 		);
@@ -943,8 +929,7 @@ class tags_manager
 
 		// delete assignments where the new tag is already assigned
 		$topic_ids_already_assigned = $this->get_topic_ids_by_tag_id($tag_to_keep_id);
-		if (!empty($topic_ids_already_assigned))
-		{
+		if (!empty($topic_ids_already_assigned)) {
 			$sql = 'DELETE FROM ' . $this->table_prefix . tables::TOPICTAGS. '
 				WHERE ' . $this->db->sql_in_set('topic_id', $topic_ids_already_assigned) . '
 					AND tag_id = ' . (int) $tag_to_delete_id;
@@ -952,7 +937,7 @@ class tags_manager
 		}
 		// renew assignments where the new tag is not assigned, yet
 		$sql_ary = array(
-			'tag_id'	=> $tag_to_keep_id,
+			'tag_id' => $tag_to_keep_id,
 		);
 		$sql = 'UPDATE ' . $this->table_prefix . tables::TOPICTAGS . '
 			SET  ' . $this->db->sql_build_array('UPDATE', $sql_ary) . '
@@ -1011,7 +996,7 @@ class tags_manager
 		$sql_array = array(
 			'SELECT'	=> 't.tag',
 			'FROM'		=> array(
-				$this->table_prefix . tables::TAGS		=> 't',
+				$this->table_prefix . tables::TAGS => 't',
 			),
 			'WHERE'		=> 't.id = ' . ((int) $tag_id),
 		);
@@ -1135,8 +1120,7 @@ class tags_manager
 	 */
 	public function get_all_tags($start, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false)
 	{
-		switch ($sort_field)
-		{
+		switch ($sort_field) {
 			case 'count':
 				$sort_field = 'count';
 				break;
@@ -1145,7 +1129,11 @@ class tags_manager
 			default:
 				$sort_field = 'tag';
 		}
-		$direction = $asc ? 'ASC' : 'DESC';
+		if ($asc) {
+			$direction = 'ASC';
+		} else {
+			$direction = 'DESC';
+		}
 		$sql = 'SELECT * FROM ' . $this->table_prefix . tables::TAGS . '
 			ORDER BY ' . $sort_field . ' ' . $direction;
 		$field_names = array(
