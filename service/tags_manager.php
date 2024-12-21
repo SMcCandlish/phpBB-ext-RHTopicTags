@@ -1122,7 +1122,7 @@ class tags_manager
 	 * @param $asc			order direction (true == asc, false == desc)
 	 * @return array		array of tags
 	 */
-	public function get_all_tags($start, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false, $sort = true)
+	public function get_all_tags($start, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false)
 	{
 		// Determine which sort field to use:
 		switch ($sort_field) {
@@ -1157,20 +1157,16 @@ class tags_manager
 		// Fetch the tags from the database:
 		$tagslist = $this->db_helper->get_multiarray_by_fieldnames($sql, $field_names, $limit, $start);
 
-		// Test whether sorting is enabled:
-		if ($sort) {
-			// If $asc is true, call alphabetic & human-friendly numeric sort:
-			if ($asc) {
-				$tagslistSorted = $this->sort_tags($tagslist, $casesensitive);
-				return $tagslistSorted;
-			}
-			/* We presently have no DESC-ordered sorting function. If one is
-			   actually needed, we can probably do it by just reversing the
-			   output of the existing sort_tags(). */
+		if ($sort_field == 'count') {
+			// These must not be run through the sorter, so we're done: 
+			return $tagslist;
+		} else {
+			// Run the array of tags through the sorter for locale-aware alphabetic
+			// and human-friendly numeric sorting of tag names:
+			$tagslistSorted = $this->sort_tags($tagslist, $casesensitive);
+			// Return the sorted tags list
+			return $tagslistSorted;
 		}
-
-		// Otherwise, return the unsorted list (wether ASC or DESC):
-		return $tagslist;
 	} // This function, in "all tags" mode, differs from get_existing_tags()
 	  // in providing IDs, "real" tag names, lowercase versions of tag names,
 	  // and count of each tag's uses; it also supports a numeric limit, and
