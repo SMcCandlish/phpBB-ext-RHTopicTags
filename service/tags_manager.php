@@ -458,7 +458,7 @@ class tags_manager
 	 * @param $casesensitive	whether the search should be casesensitive (true) or not (false).
 	 * @return array of topics	each containing all fields from TOPICS_TABLE
 	 */
-	public function get_topics_by_tags(array $tags, $start, $limit, $mode = 'AND', $casesensitive = false)
+	public function get_topics_by_tags(array $tags, $start = 0, $limit, $mode = 'AND', $casesensitive = false)
 	{
 		$sql = $this->get_topics_build_query($tags, $mode, $casesensitive);
 		$order_by = ' ORDER BY topics.topic_last_post_time DESC';
@@ -1116,15 +1116,16 @@ class tags_manager
 	/**
 	 * Gets ALL tags, unfiltered, from the database; sorts them in an array.
 	 *
-	 * @param $start		start for sql query
-	 * @param $limit		limit for sql query
-	 * @param $sort_field	the db field to order by
-	 * @param $asc			order direction (true == asc, false == desc)
-	 * @return array		array of tags
+	 * @param $start				start for SQL query
+	 * @param int $limit			limit for SQL query
+	 * @param $sort_field			the db column to order by; tag (default) or count
+	 * @param bool $casesensitive	whether to perform case-sensitive fetching
+	 * @param $asc					order direction; true (default) = ASC, false = DESC
+	 * @return array				array of tags
 	 */
-	public function get_all_tags($start, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false)
+	public function get_all_tags($start = 0, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false)
 	{
-		// Determine which sort field to use:
+		// Fetch by tag name (default) or by count of uses?
 		switch ($sort_field) {
 			case 'count':
 				$sort_field = 'count';
@@ -1133,7 +1134,8 @@ class tags_manager
 				// no break
 			default:
 				$sort_field = 'tag';
-		}
+		} // If a page is asking for `count`, it's probably to list tags by use
+		  // frequency, so `$asc = false` is probably also desired for that.
 
 		// Set the sort direction (ASC or DESC):
 		if ($asc) {
