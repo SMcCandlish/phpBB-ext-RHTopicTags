@@ -1012,12 +1012,15 @@ class tags_manager
 	 * Sorts an array of tags based on language-specific and case-sensitive/natural sorting.
 	 * 
 	 * @param array $tagslist		the array of tags to be sorted
+	 * @param $asc					order direction; true (default) = ASC, false = DESC
 	 * @param bool $casesensitive	whether to perform case-sensitive sorting
 	 * @return array				array of re-sorted tags
 	 */
-	public function sort_tags($tagslist, $casesensitive = false)
+	public function sort_tags($tagslist, $asc = true, $casesensitive = false)
 	{
-		/* By default, this extension defers to the current system
+		/* Sorting is normal ascending order unless $asc is false.
+		
+		   By default, this extension defers to the current system
 		   language_locale.charset alphabetization rules. Instead, you can set
 		   something specific here, e.g. 'en_US.UTF-8', to conform sorting to a
 		   particular language and country's norms. This might be needed in a
@@ -1072,7 +1075,12 @@ class tags_manager
 				// "natural" sorting for numeric parts; replace values in variable:
 				if ($collationResult === 0) {
 					$collationResult = strnatcasecmp($a[$tag_field], $b[$tag_field]);
-				}
+				} // Our script is "Yoda order" in `if $0 === $collationResult`
+				  // to avoid silently zeroing the value of the variable, in
+				  // the event a later edit of this code accidentally used `=`
+				  // in place of `===`. Instead of uninteded assignment of the
+				  // variable happening almost undetectably, an error would be
+				  // thrown.
 
 			return $collationResult;
 			});
@@ -1083,6 +1091,14 @@ class tags_manager
 			// We do this because that's a global setting and various other things
 			// may be making use of this in different ways. This must be done
 			// before returning out of this function for any reason.
+		}
+
+		// If descending order was requested, reverse the sorted array:
+		if (!$asc) {
+			$tagslist = array_reverse($tagslist, true);
+			// The second argument, `true`, ensures that the array keys are
+			// preserved, because they are object IDs with metadata
+			// implications, not indicators of list ordering.
 		}
 
 		return $tagslist;
@@ -1127,11 +1143,12 @@ class tags_manager
 	 * @param int $start			start for SQL query
 	 * @param int $limit			limit for SQL query
 	 * @param $sort_field			the db column to order by; tag (default) or count
-	 * @param bool $casesensitive	whether to perform case-sensitive fetching
 	 * @param $asc					order direction; true (default) = ASC, false = DESC
+	 * @param bool $casesensitive	whether to perform case-sensitive fetching
+	 * @param bool $humsort			whether to do human-friendly enhanced sorting
 	 * @return array				array of tags
 	 */
-	public function get_all_tags($start = 0, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false)
+	public function get_all_tags($start = 0, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false, $humsort = true)
 	{
 		// Fetch by tag name (default) or by count of uses?
 		switch ($sort_field) {
@@ -1168,21 +1185,27 @@ class tags_manager
 		$tagslist = $this->db_helper->get_multiarray_by_fieldnames($sql, $field_names, $limit, $start);
 
 		if ($sort_field == 'count') {
-			// That must not be run through the sorter, so we're done: 
-			return $tagslist;
-		} else {
+			// Mustn't be run through the sorter (even if sorting mistakenly
+			// requested); it's a numeric count, not any kind of label: 
+			$humsort = false;
+		}
+		if ($humsort) {
 			// Run the array of tags through the sorter for locale-aware alphabetic
 			// and human-friendly numeric sorting of tag names:
-			$tagslistSorted = $this->sort_tags($tagslist, $casesensitive);
+			$tagslistSorted = $this->sort_tags($tagslist, $asc, $casesensitive);
 			// Return the re-sorted tags list:
 			return $tagslistSorted;
+		} else {
+			// Just return the raw db version of the tags list, whether ASC or
+			// DESC, if human-friendly sorting has been turned off.
+			return $tagslist;
 		}
 	} // This function, in "all tags" mode, differs from get_existing_tags()
 	  // in providing IDs, "real" tag names, lowercase versions of tag names,
 	  // and count of each tag's uses; it also supports a numeric limit, and
 	  // has some sorting options. The other function returns only ID and
 	  // "real" tag name (or ID only, as an option), can limit by specified tag
-	  // names but not a number, and does no sorting.
+	  // names but not a number, and does no re-sorting.
 
 	/**
 	 * Gets the count of ALL tags, unfiltered.
