@@ -260,7 +260,7 @@ class tags_manager
 		$tagslist = $this->db_helper->get_array_by_fieldname($sql, ['tag', 'tag_lowercase']);
 
 		// Run the array of tags through the sorter:
-		$sortedTags = $this->sort_tags($tagslist, $casesensitive);
+		$tagslistSorted = $this->sort_tags($tagslist, $casesensitive);
 
 		// Flatten the array of sorted tags, to return only the tag names
 		// (we have no use of the forced-lowercase versions after sorting,
@@ -268,7 +268,7 @@ class tags_manager
 		// not arrays from a meta-array):
 		$tagNames = array_map(function($tag) {
 			return $tag['tag']; // Extract only the 'tag' value
-		}, $sortedTags);
+		}, $tagslistSorted);
 
 		// Return the flattened array of tag names
 		return $tagNames;
@@ -415,15 +415,15 @@ class tags_manager
 	 *
 	 * @param $tags			array of tag-names; might be null to get all existing tags
 	 * @param $only_ids		whether to return only the tag IDs (true) or tag names as well (false, default)
-	 * @return array		an array of the form array(array('id' => ... , 'tag' => ...), array('id' => ... , 'tag' => ...), ...) or array(1,2,3,...) if $only_ids == true
+	 * @return array		an array of the form array(array('id' => ... , 'tag' => ...), array('id' => ... , 'tag' => ...), ...); or array(1,2,3,...) if $only_ids == true
 	 */
 	public function get_existing_tags($tags = null, $only_ids = false)
 	{
 		$where = '';
 		if (!is_null($tags)) {
 			if (empty($tags)) {
-				// ensure that empty input array results in empty output array.
-				// note that this case is different from $tags == null where we want to get ALL existing tags.
+				// Ensure that empty input array results in empty output array.
+				// Note that this case is different from $tags == null where we want to get ALL existing tags.
 				return array();
 			}
 			$where = 'WHERE ' . $this->db->sql_in_set('tag', $tags);
@@ -438,7 +438,11 @@ class tags_manager
 				'id',
 				'tag'
 			));
-	}
+	} // This function, in its "all tags" mode, differs from get_all_tags() in
+	  // providing only ID and "real" tagname (or IDs only, if that's chosen);
+	  // the other function provides IDs, "real" tag names, lowercase versions
+	  // of tag names, and count of each tag's uses; it also supports a number
+	  // $limit, but not a constraint by specified tag names.
 
 	/**
 	 * Gets the topics which are tagged with any or all of the given $tags,
@@ -1022,7 +1026,7 @@ class tags_manager
 		   BE SURE that your system supports the localization you choose!
 		   
 		   We cannot use phpBB variables like $user_lang_name or S_USER_LANG
-		   because thos are simplifications like "en", not PHP-understood
+		   because those are simplifications like "en", not PHP-understood
 		   localization names.
 		*/
 		// Save the current locale before changing it:
@@ -1110,7 +1114,7 @@ class tags_manager
 	}
 
 	/**
-	 * Gets all tags.
+	 * Gets ALL tags, unfiltered, from the database; sorts them in an array.
 	 *
 	 * @param $start		start for sql query
 	 * @param $limit		limit for sql query
@@ -1118,8 +1122,9 @@ class tags_manager
 	 * @param $asc			order direction (true == asc, false == desc)
 	 * @return array		array of tags
 	 */
-	public function get_all_tags($start, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false)
+	public function get_all_tags($start, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false, $sort = true)
 	{
+		// Determine which sort field to use:
 		switch ($sort_field) {
 			case 'count':
 				$sort_field = 'count';
@@ -1129,28 +1134,49 @@ class tags_manager
 			default:
 				$sort_field = 'tag';
 		}
+
+		// Set the sort direction (ASC or DESC):
 		if ($asc) {
 			$direction = 'ASC';
 		} else {
 			$direction = 'DESC';
 		}
+
+		// Define SQL query to fetch tags from the database:
 		$sql = 'SELECT * FROM ' . $this->table_prefix . tables::TAGS . '
 			ORDER BY ' . $sort_field . ' ' . $direction;
+
+		// Define the field names to fetch from the database:
 		$field_names = array(
 			'id',
 			'tag',
 			'tag_lowercase',
 			'count'
 		);
+
 		// Fetch the tags from the database:
 		$tagslist = $this->db_helper->get_multiarray_by_fieldnames($sql, $field_names, $limit, $start);
 
-		// Run the array of tags through the sorter:
-		$sortedTags = $this->sort_tags($tagslist, $casesensitive);
+		// Test whether sorting is enabled:
+		if ($sort) {
+			// If $asc is true, call alphabetic & human-friendly numeric sort:
+			if ($asc) {
+				$tagslistSorted = $this->sort_tags($tagslist, $casesensitive);
+				return $tagslistSorted;
+			}
+			/* We presently have no DESC-ordered sorting function. If one is
+			   actually needed, we can probably do it by just reversing the
+			   output of the existing sort_tags(). */
+		}
 
-		// Return the sorted tags list
-		return $sortedTags;
-	}
+		// Otherwise, return the unsorted list (wether ASC or DESC):
+		return $tagslist;
+	} // This function, in "all tags" mode, differs from get_existing_tags()
+	  // in providing IDs, "real" tag names, lowercase versions of tag names,
+	  // and count of each tag's uses; it also supports a numeric limit, and
+	  // has some sorting options. The other function returns onl ID and "real"
+	  // tag name (or ID only, as an option), can limit by specified tag names
+	  // but not a number, and does no sorting.
 
 	/**
 	 * Gets the count of all tags.
