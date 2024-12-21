@@ -451,8 +451,8 @@ class tags_manager
 	 * determinations are handled by other functions called in a chain from
 	 * this one.
 	 *
-	 * @param $start			start for sql query
-	 * @param $limit			limit for sql query
+	 * @param int $start		start for SQL query
+	 * @param int $limit		limit for SQL query
 	 * @param $tags				array of tags to find the topics for
 	 * @param $mode				AND=all tags must be assigned, OR=at least one tag needs to be assigned
 	 * @param $casesensitive	whether the search should be casesensitive (true) or not (false).
@@ -1008,13 +1008,13 @@ class tags_manager
 		return $this->db_helper->get_field($sql, 'tag', 1);
 	}
 
-    /**
-     * Sorts an array of tags based on language-specific and case-sensitive/natural sorting.
-     * 
-     * @param array $tagslist		The list of tags to be sorted.
-     * @param bool $casesensitive	Whether to perform case-sensitive sorting.
-     * @return array				The sorted tagslist.
-     */
+	/**
+	 * Sorts an array of tags based on language-specific and case-sensitive/natural sorting.
+	 * 
+	 * @param array $tagslist		the array of tags to be sorted
+	 * @param bool $casesensitive	whether to perform case-sensitive sorting
+	 * @return array				array of re-sorted tags
+	 */
 	public function sort_tags($tagslist, $casesensitive = false)
 	{
 		/* By default, this extension defers to the current system
@@ -1034,62 +1034,70 @@ class tags_manager
 		// 0 (WITHOUT quotation marks!) gets the current locale setting.
 
 		setlocale(LC_COLLATE, '0');
-		// Note the quotation marks this time.
+		// Note the single quotation marks this time.
 		// Or specify a locale in place of '0'; ensure your system supports it! 
 		
-		// If someone has changed '0' above to something specific, we need to
-		// check that the locale was actually set successfully since some of
-		// the locale strings are complicated and someone might get one wrong.
-		if (!$original_locale) {
-			// Locale wasn't set successfully, so handle this case.
-			// First log it:
-			error_log("RH Topic Tags (tags_manager.php): Locale setting '$original_locale' failed. Falling back to default locale.");
-			// Now set it back to system default:
-			setlocale(LC_COLLATE, '0');
-		}
+		try {	// Keep sorting logic in a "sandbox" to protect setlocale ...
 
-		// Determine which field to use based on the value of $casesensitive:
-		if ($casesensitive) {
-			$tag_field = 'tag';  // "Official" tag names as saved in the db.
-		} else {
-			$tag_field = 'tag_lowercase';  // Db already has LC version, too.
-		}
-
-		// Perform both language-specific sorting (via strcoll) and
-		// natural numeric sorting (via strnatcasecmp) in one pass:
-		usort($tagslist, function($a, $b) use ($tag_field) {
-
-			// First, compare alphabetically with language-specific collation
-			// (by setlocale localization above); store result in a variable:
-			$collationResult = strcoll($a[$tag_field], $b[$tag_field]);
-
-			// If alphabetically equal (strcoll returns 0), use human-friendly
-			// "natural" sorting for numeric parts; replace values in variable:
-			if ($collationResult === 0) {
-				$collationResult = strnatcasecmp($a[$tag_field], $b[$tag_field]);
+			// If someone has changed '0' above to something specific, we need to
+			// check that the locale was actually set successfully since some of
+			// the locale strings are complicated and someone might get one wrong.
+			if (!$original_locale) {
+				// Locale wasn't set successfully, so handle this case.
+				// First log it:
+				error_log("RH Topic Tags (service/tags_manager.php): Locale setting '$original_locale' failed. Falling back to default locale.");
+				// Now set it back to system default:
+				setlocale(LC_COLLATE, '0');
 			}
 
-        return $collationResult;
-		});
+			// Determine which field to use based on case-sensitivity:
+			if ($casesensitive) {
+				$tag_field = 'tag';  // "Official" tag names as saved in the db.
+			} else {
+				$tag_field = 'tag_lowercase';  // Db already has LC version, too.
+			}
 
-		// Restore the original locale after sorting:
-		setlocale(LC_COLLATE, $original_locale);
-		// We do this because that's a global setting and various other things
-		// may be making use of this in different ways.
+			// Perform both language-specific sorting (via strcoll) and
+			// natural numeric sorting (via strnatcasecmp) in one pass:
+			uasort($tagslist, function($a, $b) use ($tag_field) {
+			// uasort not usort because the former ensures that the array keys
+			// are preserved; they are object IDs with metadata implications,
+			// not indicators of list ordering.
+
+				// First, compare alphabetically with language-specific collation
+				// (by setlocale localization above); store result in a variable:
+				$collationResult = strcoll($a[$tag_field], $b[$tag_field]);
+
+				// If alphabetically equal (strcoll returns 0), use human-friendly
+				// "natural" sorting for numeric parts; replace values in variable:
+				if ($collationResult === 0) {
+					$collationResult = strnatcasecmp($a[$tag_field], $b[$tag_field]);
+				}
+
+			return $collationResult;
+			});
+
+		} finally {
+			// Always restore the original locale, even if an error occurred:
+			setlocale(LC_COLLATE, $original_locale);
+			// We do this because that's a global setting and various other things
+			// may be making use of this in different ways. This must be done
+			// before returning out of this function for any reason.
+		}
 
 		return $tagslist;
 
 		/* Closing notes: 
 		
 		   strcoll() is used because it is specifically designed to perform
-		   a string comparison according to the current locale, respecting
+		   a string comparison compliant with the current locale, respecting
 		   language/regional rules for alphabetizing strings, including
 		   handling special characters (like diacritics), case differences,
 		   and other variations in string order. E.g. the alphabetization
 		   of ö is different between German and Swedish.
 
 		   In cases where setlocale() fails or cannot be set to a desired
-		   locale, we could potentially fallback to strnatcasecmp() in place
+		   locale, we could potentially fall back to strnatcasecmp() in place
 		   of strcoll(), though this would not have the nuances of the latter's
 		   language-specific collation. This would be some work, so will not
 		   be implemented without clear demand for it.
@@ -1105,18 +1113,18 @@ class tags_manager
 		   Server 500 errors, so phpBB or the underlying PHP installation is
 		   not working with this. Even if it's a local-config problem, we can't
 		   depend on this newer approach being available. It might be possible
-		   to test for it and use it if usable and fall back to strcoll() if
+		   to test for it and use it if usable but fall back to strcoll() if
 		   not, but so far any attempt to use it at all causes 500 error. It's
 		   also not practicable to have the database itself do the collating
-		   via the SQL query that retrieve the tags, since the collation
-		   names between MySQL, PostreSQL, etc., are not in agreement.
+		   via the SQL query that fetches the tags, since the collation names
+		   between MySQL, PostreSQL, etc., are not in agreement.
 		*/
 	}
 
 	/**
 	 * Gets ALL tags, unfiltered, from the database; sorts them in an array.
 	 *
-	 * @param $start				start for SQL query
+	 * @param int $start			start for SQL query
 	 * @param int $limit			limit for SQL query
 	 * @param $sort_field			the db column to order by; tag (default) or count
 	 * @param bool $casesensitive	whether to perform case-sensitive fetching
@@ -1137,11 +1145,11 @@ class tags_manager
 		} // If a page is asking for `count`, it's probably to list tags by use
 		  // frequency, so `$asc = false` is probably also desired for that.
 
-		// Set the sort direction (ASC or DESC):
+		// Set the fetch direction (ASC or DESC):
 		if ($asc) {
-			$direction = 'ASC';
+			$direction = 'ASC';	// Ascending db fetch order
 		} else {
-			$direction = 'DESC';
+			$direction = 'DESC'; // Descending db fetch order
 		}
 
 		// Define SQL query to fetch tags from the database:
@@ -1160,26 +1168,26 @@ class tags_manager
 		$tagslist = $this->db_helper->get_multiarray_by_fieldnames($sql, $field_names, $limit, $start);
 
 		if ($sort_field == 'count') {
-			// These must not be run through the sorter, so we're done: 
+			// That must not be run through the sorter, so we're done: 
 			return $tagslist;
 		} else {
 			// Run the array of tags through the sorter for locale-aware alphabetic
 			// and human-friendly numeric sorting of tag names:
 			$tagslistSorted = $this->sort_tags($tagslist, $casesensitive);
-			// Return the sorted tags list
+			// Return the re-sorted tags list:
 			return $tagslistSorted;
 		}
 	} // This function, in "all tags" mode, differs from get_existing_tags()
 	  // in providing IDs, "real" tag names, lowercase versions of tag names,
 	  // and count of each tag's uses; it also supports a numeric limit, and
-	  // has some sorting options. The other function returns onl ID and "real"
-	  // tag name (or ID only, as an option), can limit by specified tag names
-	  // but not a number, and does no sorting.
+	  // has some sorting options. The other function returns only ID and
+	  // "real" tag name (or ID only, as an option), can limit by specified tag
+	  // names but not a number, and does no sorting.
 
 	/**
-	 * Gets the count of all tags.
+	 * Gets the count of ALL tags, unfiltered.
 	 *
-	 * @return int the count of all tags
+	 * @return int	the count of all tags
 	 */
 	public function count_tags()
 	{
