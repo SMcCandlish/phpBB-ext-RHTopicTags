@@ -398,13 +398,27 @@ class tags_manager
 	 */
 	private function in_array_r($needle, $haystack, $strict = false)
 	{
-		foreach ($haystack as $item)
-		{
-			if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && $this->in_array_r($needle, $item, $strict)))
-			{
-				return true;
+		foreach ($haystack as $item) {
+			// Check if the current item matches the needle:
+			if ($strict) {
+				if ($item === $needle) {
+					return true;
+				}
+			} else {
+				if ($item == $needle) {
+					return true;
+				}
+			}
+
+			// If the item is an array, recursively search within it:
+			if (is_array($item)) {
+				if ($this->in_array_r($needle, $item, $strict)) {
+					return true;
+				}
 			}
 		}
+
+		// If no match is found even after iterating through the array:
 		return false;
 	}
 
@@ -445,9 +459,11 @@ class tags_manager
 	}
 
 	/**
-	 * Gets the topics which are tagged with any or all of the given $tags from
-	 * all forums, where tagging is enabled and only those which the user is
-	 * allowed to read.
+	 * Gets the topics which are tagged with any or all of the given $tags,
+	 * from all forums in which tagging is enabled AND which the user is
+	 * allowed to read (BUT exclusive of unapproved topics). These filtering
+	 * determinations are handled by other functions called in a chain from
+	 * this one.
 	 *
 	 * @param $start			start for sql query
 	 * @param $limit			limit for sql query
@@ -566,8 +582,10 @@ class tags_manager
 			return 'SELECT topics.* FROM ' . TOPICS_TABLE . ' topics WHERE 0=1';
 		}
 
-		// validate mode
-		$mode = ($mode == 'OR' ? 'OR' : 'AND');
+		// Validate mode (force a valid value if something strange was given):
+		if ($mode !== 'OR') {
+			$mode = 'AND'; // default
+		}
 
 		$sql_where_tag_in = $this->sql_in_casesensitive_tag($tags, $casesensitive);
 		$sql_where_topic_access = $this->sql_where_topic_access();
