@@ -1150,17 +1150,14 @@ class tags_manager
 	 */
 	public function get_all_tags($start = 0, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false, $humsort = true)
 	{
-		// Fetch by tag name (default) or by count of uses?
-		switch ($sort_field) {
-			case 'count':
-				$sort_field = 'count';
-				break;
-			case 'tag':
-				// no break
-			default:
-				$sort_field = 'tag';
-		} // If a page is asking for `count`, it's probably to list tags by use
-		  // frequency, so `$asc = false` is probably also desired for that.
+		// Validate the sort field using a whitelist, to prevent SQL injection
+		// or simply invalid-input errors. Whitelist presently permits fetching
+		// by tag name (default) or by count of tag uses; easily extended:
+		$allowed_sort_fields = ['tag', 'count'];
+		// Force `tag` as default if value is invalid by the above test:
+		if (!in_array($sort_field, $allowed_sort_fields, true)) {
+			$sort_field = 'tag';
+		}
 
 		// Set the fetch direction (ASC or DESC):
 		if ($asc) {
