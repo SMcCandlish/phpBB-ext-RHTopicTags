@@ -1012,11 +1012,11 @@ class tags_manager
 	 * Sorts an array of tags based on language-specific and case-sensitive/natural sorting.
 	 * 
 	 * @param array $tagslist		the array of tags to be sorted
-	 * @param $asc					order direction; true (default) = ASC, false = DESC
 	 * @param bool $casesensitive	whether to perform case-sensitive sorting
+	 * @param $asc					order direction; true (default) = ASC, false = DESC
 	 * @return array				array of re-sorted tags
 	 */
-	public function sort_tags($tagslist, $asc = true, $casesensitive = false)
+	public function sort_tags($tagslist, $casesensitive = false, $asc = true)
 	{
 		/* Sorting is normal ascending order unless $asc is false.
 		
@@ -1143,12 +1143,12 @@ class tags_manager
 	 * @param int $start			start for SQL query
 	 * @param int $limit			limit for SQL query
 	 * @param $sort_field			the db column to order by; tag (default) or count
-	 * @param $asc					order direction; true (default) = ASC, false = DESC
 	 * @param bool $casesensitive	whether to perform case-sensitive fetching
+	 * @param $asc					order direction; true (default) = ASC, false = DESC
 	 * @param bool $humsort			whether to do human-friendly enhanced sorting
 	 * @return array				array of tags
 	 */
-	public function get_all_tags($start = 0, $limit, $sort_field = 'tag', $asc = true, $casesensitive = false, $humsort = true)
+	public function get_all_tags($start = 0, $limit, $sort_field = 'tag', $casesensitive = false, $asc = true, $humsort = true)
 	{
 		// Validate the sort field using a whitelist, to prevent SQL injection
 		// or simply invalid-input errors. Whitelist presently permits fetching
