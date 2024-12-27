@@ -29,7 +29,7 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.3",
+		"php": ">=7.2.0",
 		"phpbb/phpbb": ">=3.3"
 	},
 	"require-dev": {
