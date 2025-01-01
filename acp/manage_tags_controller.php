@@ -15,7 +15,7 @@ namespace robertheim\topictags\acp;
 use \phpbb\json_response;
 
 /**
-* Handles the "manage-tags" page of the ACP.
+* Handles the "Manage Tags" page of the ACP.
 */
 class manage_tags_controller
 {
@@ -61,9 +61,9 @@ class manage_tags_controller
 	}
 
 	/**
-	 * @param string $mode phpbb acp-mode
-	 * @param string $u_action phpbb acp-u_action
-	 * @param string $id the modules-id (url-param "i")
+	 * @param string $mode		phpBB ACP mode
+	 * @param string $u_action	phpBB ACP user action
+	 * @param string $id		the module's ID (URL parameter "i")
 	 */
 	public function manage_tags($mode, $u_action, $id)
 	{
@@ -127,9 +127,9 @@ class manage_tags_controller
 	}
 
 	/**
-	 * @param string $mode phpbb acp-mode
-	 * @param string $u_action phpbb acp-u_action
-	 * @param string $id
+	 * @param string $mode		phpBB ACP mode
+	 * @param string $u_action	phpBB ACP user action
+	 * @param string $id		the module's ID (URL parameter "i")
 	 */
 	private function handle_delete($mode, $u_action, $id)
 	{
@@ -168,8 +168,8 @@ class manage_tags_controller
 	}
 
 	/**
-	 * @param $is_ajax whether the edit is called by ajax or not
-	 * @param string $u_action phpbb acp-u_action
+	 * @param $is_ajax			whether the edit is called by Ajax or not
+	 * @param string $u_action	phpBB ACP user action
 	 */
 	private function handle_edit($u_action, $is_ajax = true)
 	{
@@ -187,7 +187,7 @@ class manage_tags_controller
 				));
 				return;
 			}
-			// now new_tag_name and old_tag_name are set and the normal procedure can take place.
+			// Now new_tag_name and old_tag_name are set and the normal procedure can take place.
 		}
 		$old_tag_name = $this->request->variable('old_tag_name', '');
 		$new_tag_name = $this->request->variable('new_tag_name', '');
@@ -215,7 +215,7 @@ class manage_tags_controller
 				$error_msg = $this->user->lang('TOPICTAGS_TAG_DOES_NOT_EXIST', $old_tag_name);
 				$this->simple_response($u_action, $error_msg, false);
 			}
-			// if we reach here, we know that we got a single valid old tag
+			// If we reach here, we know that we got a single valid old tag.
 			$old_id = $old_ids[0];
 
 			$new_tag_name_clean = $this->tags_manager->clean_tag($new_tag_name);
@@ -226,11 +226,11 @@ class manage_tags_controller
 				$this->simple_response($u_action, $error_msg, false);
 			}
 
-			// old tag exist and new tag is valid
+			// Old tag exists and new tag is valid.
 			$new_ids = $this->tags_manager->get_existing_tags(array($new_tag_name), true);
 			if (!empty($new_ids))
 			{
-				// new tag exist -> merge
+				// New tag exists, so merge:
 				$new_id = $new_ids[0];
 				$new_tag_count = $this->tags_manager->merge($old_id, $new_tag_name, $new_id);
 				$msg = $this->user->lang('TOPICTAGS_TAG_MERGED', $new_tag_name_clean);
@@ -242,7 +242,7 @@ class manage_tags_controller
 				));
 			}
 
-			// old tag exist and new tag is valid and does not exist -> rename it
+			// Old tag exists, and new tag is valid and does not already exist, so rename old to new:
 			$this->tags_manager->rename($old_id, $new_tag_name_clean);
 			$msg = $this->user->lang('TOPICTAGS_TAG_CHANGED');
 			$this->simple_response($u_action, $msg);
@@ -250,22 +250,24 @@ class manage_tags_controller
 	}
 
 	/**
-	 * Creates an ajax response or a normal response depending on the request.
+	 * Creates an Ajax response or a normal response depending on the request.
 	 *
-	 * @param string $u_action phpbb acp-u_action
-	 * @param string $msg the message for the normal response
-	 * @param boolean $success whether the response is marked successful (default) or not
-	 * @param array $ajax_response optional values to response in ajax_response. If no values are
-	 *                             given the response will be for success==true:
-	 *                                <pre>array(
-	 *                                  'success' => true,
-	 *                                  'msg' => base64_encode(rawurlencode($msg))
-	 *                                )</pre>
-	 *                             and for success==false:
-	 *                                <pre>array(
-	 *                                  'success' => false,
-	 *                                  'error_msg' => base64_encode(rawurlencode($msg))
-	 *                                )</pre>
+	 * @param string $u_action		phpBB ACP user action
+	 * @param string $msg			the message for the normal response
+	 * @param boolean $success		whether the response is marked successful
+	 *								 (default) or not
+	 * @param array $ajax_response	optional values for response if using Ajax.
+	 * 								  If no values are given, the response will
+	 * 								  be for success==true:
+	 * 								   array(
+	 * 								     'success' => true,
+	 * 								     'msg' => base64_encode(rawurlencode($msg))
+	 * 								   )
+	 * 								  and for success==false:
+	 * 								   array(
+	 * 								    'success' => false,
+	 * 								    'error_msg' => base64_encode(rawurlencode($msg))
+	 * 								   )
 	 */
 	private function simple_response($u_action, $msg, $success = true, array $ajax_response = array())
 	{
