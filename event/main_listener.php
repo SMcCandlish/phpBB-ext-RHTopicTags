@@ -274,7 +274,9 @@ class main_listener implements EventSubscriberInterface
 	 * Checks whether the HTTP POST data indicates that the first post in the topic is being edited.
 	 *
 	 * @param string $mode		the event's data mode
-	 * @param array $post_data	the event data
+	 * @param array $post_data	the event's HTTP POST data, expected to include:
+	 * 							- 'post_id' (int): ID of the forum post being edited
+	 * 							- 'topic_first_post_id' (int): ID of the 1st post in the topic
 	 * @return boolean			true if the topic's first post is being edited; false otherwise
 	 */
 	private function is_edit_first_post($mode, array $post_data)
