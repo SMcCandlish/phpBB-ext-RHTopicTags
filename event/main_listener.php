@@ -2,7 +2,7 @@
 /**
 *
 * @package phpBB Extension - RH Topic Tags
-* @copyright © 2014 Robert Heim
+* @copyright © 2014 Robert Heim; revision 2024 by S. McCandlish
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -66,14 +66,14 @@ class main_listener implements EventSubscriberInterface
 	 * Constructor
 	 */
 	public function __construct(
-							\phpbb\config\config $config,
-							\robertheim\topictags\service\tags_manager $tags_manager,
-							\phpbb\controller\helper $helper,
-							\phpbb\request\request $request,
-							\phpbb\user $user,
-							\phpbb\template\template $template,
-							\phpbb\auth\auth $auth,
-							\robertheim\topictags\service\tagcloud_manager $tagcloud_manager
+		\phpbb\config\config $config,
+		\robertheim\topictags\service\tags_manager $tags_manager,
+		\phpbb\controller\helper $helper,
+		\phpbb\request\request $request,
+		\phpbb\user $user,
+		\phpbb\template\template $template,
+		\phpbb\auth\auth $auth,
+		\robertheim\topictags\service\tagcloud_manager $tagcloud_manager
 	)
 	{
 		$this->config = $config;
@@ -87,10 +87,11 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Reads all tags from request variable 'rh_topictags' and splits them by the separator (default: comma (',')) and trims them.
+	 * Reads all tags from HTTP POST request variable 'rh_topictags' and splits
+	 * them by the separator (default: comma ',') and trims them.
 	 * NOTE: These tags might be dirty!
 	 *
-	 * @return array of dirty tags
+	 * @return array	array of potentially dirty tags
 	 */
 	private function get_tags_from_post_request()
 	{
@@ -111,7 +112,8 @@ class main_listener implements EventSubscriberInterface
 		}
 
 		return $tags;
-	}
+	} // Note "post" in the name of this function refers to the HTTP POST
+	  // input method, not to posts in the phpBB sense of posts and topics.
 
 	/**
 	 * Event: core.load_language_on_setup
@@ -129,7 +131,7 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * Loads the permissions.
 	 *
-	 * @param mixed $event The event data
+	 * @param mixed $event	the event data
 	 */
 	public function permissions($event)
 	{
@@ -142,6 +144,8 @@ class main_listener implements EventSubscriberInterface
 
 	/**
 	 * Event: core.index_modify_page_title
+	 *
+	 * @param mixed $event	the event data
 	 */
 	public function index_modify_page_title($event)
 	{
@@ -159,6 +163,8 @@ class main_listener implements EventSubscriberInterface
 	 * Event: core.modify_posting_parameters
 	 *
 	 * Validate the tags and create an error if any tag is invalid.
+	 *
+	 * @param mixed $event	the event data
 	 */
 	public function modify_posting_parameters($event)
 	{
@@ -185,6 +191,8 @@ class main_listener implements EventSubscriberInterface
 	 * Event: core.postingsubmit_post_end
 	 *
 	 * After a posting we assign the tags to the topic
+	 *
+	 * @param mixed $event	the event data
 	 */
 	public function submit_post_end($event)
 	{
@@ -206,9 +214,9 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * Event: core.posting_modify_template_vars
 	 *
-	 * Send the tags on edits or preview to the template
+	 * Send the tags on edits or preview to the template.
 	 *
-	 * @param $event
+	 * @param mixed $event	the event data
 	 */
 	public function posting_modify_template_vars($event)
 	{
@@ -244,24 +252,30 @@ class main_listener implements EventSubscriberInterface
 				$event->set_data($data);
 			}
 		}
-	}
+	} // Note: "post" in 'post_data' means the HTTP POST method of data input;
+	  // not referring to posts in the phpBB sense of posts, topics & forums.
 
 	/**
-	 * Checks whether the mode indicates a new topic or not.
-	 * @param string $mode the mode.
-	 * @return true if mode == post (indicating a new topic), false otherwise
+	 * Checks whether the mode indicates a new topic.
+	 *
+	 * @param string $mode	the mode
+	 * @return boolean		true if mode == post (indicating a new topic); false otherwise
 	 */
 	private function is_new_topic($mode)
 	{
 		return $is_new_topic = $mode == 'post';
-	}
+	} // Note: "post" in $mode's context means "creating a post" (vs. "editing
+	  // a post" or "replying to a post"); it doesn't refer to the HTTP POST
+	  // method of data input, nor to distinctions betweeen phpBB posts, topics
+	  // and forums. Rather, it means establishing a new topic with an all-new
+	  // post, as the first post (to which tags attach) in the new topic.
 
 	/**
-	 * Check whether the post data indicates that the first post of a topic is edited or not.
+	 * Checks whether the HTTP POST data indicates that the first post in the topic is being edited.
 	 *
-	 * @param string $mode the events data mode
-	 * @param array $post_data the event data
-	 * @return boolean true if it is a first post edit, false otherwise
+	 * @param string $mode		the event's data mode
+	 * @param array $post_data	the event data
+	 * @return boolean			true if the topic's first post is being edited; false otherwise
 	 */
 	private function is_edit_first_post($mode, array $post_data)
 	{
@@ -275,30 +289,39 @@ class main_listener implements EventSubscriberInterface
 			$post_id = $post_data['post_id'];
 		}
 		return $mode == 'edit' && $post_id && $post_id == $topic_first_post_id;
-	}
+	} // As noted above, the word "post" is trebly "operator-overloaded". In
+	  // this function, it means a phpBB content post (versus a topic with
+	  // posts or a forum of topics) in $post_id and $topic_first_post_id. But
+	  // it means "HTTP POST data from a submitted form" in $post_data. Then
+	  // in the context of $mode, it is the opposite of the 'edit' tested for
+	  // here (and would indicate creation of a new post rather than editing
+	  // of an existing one). These variables would be better renamed to be
+	  // distinctive and clear, but that would have to be done perfectly across
+	  // multiple files in this extension's codebase, so it's easier to just
+	  // insert some explanatory notes like these.
 
 	/**
-	 * Calculates the template data for the topic
+	 * Calculates the template data for the topic.
 	 *
-	 * @param int $topic_id the id of the topic
-	 * @param boolean $is_edit_first_post whether it is a first post edit or not
-	 * @return array the page data
+	 * @param int $topic_id					the ID of the topic
+	 * @param boolean $is_edit_first_post	whether it is a first post edit or not
+	 * @return array						the page data
 	 */
 	private function get_template_data_for_topic($topic_id, $is_edit_first_post)
 	{
 		$page_data = array();
 		$page_data['RH_TOPICTAGS_SHOW_FIELD'] = true;
 
-		// do we got some preview-data?
+		// Do we have some preview data?
 		$tags = array();
 		if ($this->request->is_set_post('rh_topictags'))
 		{
-			// use data from post-request
+			// Use data from post-request:
 			$tags = $this->get_tags_from_post_request();
 		}
 		else if ($is_edit_first_post)
 		{
-			// use data from db
+			// Use data from db:
 			$tags = $this->tags_manager->get_assigned_tags($topic_id);
 		}
 
@@ -333,13 +356,13 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * Event: core.viewforum_modify_topicrow
 	 *
-	 * Get and assign tags to topic-row-template -> RH_TOPICTAGS_TAGS.
+	 * Gets and assigns tags to topic-row template -> RH_TOPICTAGS_TAGS.
 	 *
-	 * Note that we assign a string which includes the a-href-links already,
-	 * because we cannot assign sub-blocks before the outer-block with
-	 * assign_block_vars(...) and the event is before the actual assignment.
+	 * Note that we assign a string which includes the <a href ...> link
+	 * already, because we cannot assign sub-blocks before the outer block
+	 * with assign_block_vars(...) and the event is before the assignment.
 	 *
-	 * @param $event
+	 * @param mixed $event	the event data
 	 */
 	public function viewforum_modify_topicrow($event)
 	{
@@ -354,16 +377,17 @@ class main_listener implements EventSubscriberInterface
 				$tags = $this->tags_manager->get_assigned_tags($topic_id);
 				if (!empty($tags))
 				{
-					// we cannot use assign_block_vars('topicrow.tags', ...) here, because the block 'topicrow' is not yet assigned
-					// add links
+					// We cannot use assign_block_vars('topicrow.tags', ...)
+					// here, because the block 'topicrow' is not yet assigned.
+					// Add links:
 					$this->assign_tags_to_template('rh_tags_tmp', $tags);
-					// small_tag.html might want to use our extension's css.
+					// small_tag.html might want to use our extension's CSS:
 					$this->template->assign_var('S_RH_TOPICTAGS_INCLUDE_CSS', true);
 					$rendered_tags = $this->template->assign_display('@robertheim_topictags/small_tag.html');
-					// remove temporary data
+					// Remove temporary data:
 					$this->template->destroy_block_vars('rh_tags_tmp');
 
-					// assign the template data
+					// Assign the template data:
 					$data['topic_row']['RH_TOPICTAGS_TAGS'] = $rendered_tags;
 
 					$event->set_data($data);
@@ -375,8 +399,8 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * Assigns the given tags to the template block
 	 *
-	 * @param string $block_name the name of the template block
-	 * @param array $tags the tags to assign
+	 * @param string $block_name	the name of the template block
+	 * @param array $tags			the tags to assign
 	 */
 	private function assign_tags_to_template($block_name, array $tags)
 	{
@@ -394,9 +418,9 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * Event: core.viewtopic_assign_template_vars_before
 	 *
-	 * assign tags to topic-template and header-meta
+	 * Assigns tags to topic template and header meta.
 	 *
-	 * @param $event
+	 * @param mixed $event	the event data
 	 */
 	public function viewtopic_assign_template_vars_before($event)
 	{
@@ -414,7 +438,7 @@ class main_listener implements EventSubscriberInterface
 					'RH_TOPICTAGS_SHOW'	=> true,
 					'META'				=> '<meta name="keywords" content="' . join(', ', $tags) . '">',
 				));
-				// tags might want to use our extension's css.
+				// tags.html might want to use our extension's CSS:
 				$this->template->assign_var('S_RH_TOPICTAGS_INCLUDE_CSS', true);
 			}
 		}
@@ -423,9 +447,9 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * Event: core.delete_topics_before_query
 	 *
-	 * prune tags when topic is deleted
+	 * Prunes tags when topic is deleted.
 	 *
-	 * @param $event
+	 * @param mixed $event	the event data
 	 */
 	public function delete_topics_before_query($event)
 	{
