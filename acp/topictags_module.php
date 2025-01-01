@@ -30,10 +30,10 @@ class topictags_module
 	}
 
 	/**
-	 * Delegates to proper functions that handle the specific case
+	 * Delegates to functions that handle the specific cases.
 	 *
-	 * @param string $id the id of the acp-module (the url-param "i")
-	 * @param string $mode the phpbb acp-mode
+	 * @param string $id	the ID of the ACP module (the URL parameter "i")
+	 * @param string $mode	the phpBB ACP mode
 	 */
 	public function main($id, $mode)
 	{
@@ -76,7 +76,7 @@ class topictags_module
 	private function handle_settings()
 	{
 		global $config, $request, $template, $user;
-		// Define the name of the form for use as a form key
+		// Define the name of the form for use as a form key:
 		$form_name = 'topictags';
 		add_form_key($form_name);
 
