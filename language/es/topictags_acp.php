@@ -60,6 +60,9 @@ $lang = array_merge($lang, array(
 	// También puedes cambiar cualquiera de estos para que tenga un mínimo de
 	// 1 carácter, como {1,30}, si necesitas tener en cuenta cosas como el
 	// lenguaje de programación llamado R.
+	//
+	// Si cambia el máximo para que ya no sea 30, realice el mismo cambio en
+	// adm/style/topictags_manage_tags.html
 ));
 
 $lang = array_merge($lang, array(
