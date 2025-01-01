@@ -82,8 +82,8 @@ class tagcloud_manager
 		} //This script uses "Yoda order" in `if $0 == $maxtags` to avoid
 		  // silently zeroing the value of the variable, in the event a later
 		  // edit of this code accidentally used `=` in place of `==`.
-		  // Instead of that happening almost undetectably, an error would
-		  // be thrown. */
+		  // Instead of unintended variable assignment happening almost
+		  // undetectably, an error would be thrown.
 
 		$maximum = $this->get_maximum_tag_usage_count();
 
