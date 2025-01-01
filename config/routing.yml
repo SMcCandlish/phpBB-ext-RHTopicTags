@@ -7,5 +7,5 @@ robertheim_topictags_show_tag_controller:
 robertheim_topictags_suggest_tags_controller:
     path: /tags/suggest
     defaults: { _controller: robertheim.topictags.controller:suggest_tags }
-    methods:  [POST]
+    methods: [POST]
 
