@@ -13,7 +13,7 @@ namespace robertheim\topictags\acp;
 use robertheim\topictags\prefixes;
 
 /**
- * Handles the "whitelist" and "blacklist" page of the ACP.
+ * Handles the "Whitelist" and "Blacklist" pages of the ACP.
  */
 class white_and_blacklist_controller
 {
@@ -55,7 +55,7 @@ class white_and_blacklist_controller
 
 	/**
 	 *
-	 * @param string $u_action phpbb acp-u_action
+	 * @param string $u_action	phpBB ACP user action
 	 */
 	public function manage_whitelist($u_action)
 	{
@@ -64,7 +64,7 @@ class white_and_blacklist_controller
 
 	/**
 	 *
-	 * @param string $u_action phpbb acp-u_action
+	 * @param string $u_action	phpBB ACP user action
 	 */
 	public function manage_blacklist($u_action)
 	{
@@ -72,13 +72,13 @@ class white_and_blacklist_controller
 	}
 
 	/**
-	 * @param string $list_name whitelist or blacklist
-	 * @param string $u_action phpbb acp-u_action
+	 * @param string $list_name Whitelist or Blacklist
+	 * @param string $u_action	phpBB ACP user action
 	 */
 	private function manage_list($u_action, $list_name)
 	{
 		$list_name_upper = strtoupper($list_name);
-		// Define the name of the form for use as a form key
+		// Define the name of the form for use as a form key:
 		$form_name = 'topictags';
 		add_form_key($form_name);
 
@@ -103,12 +103,12 @@ class white_and_blacklist_controller
 				}
 				$list = json_encode($tags);
 			}
-			// store the list
+			// Store the list:
 			$this->config_text->set(prefixes::CONFIG . '_' . $list_name, $list);
 			trigger_error($this->user->lang('TOPICTAGS_' . $list_name_upper . '_SAVED') . adm_back_link($u_action));
 		}
 
-		// display
+		// Display:
 		$list = $this->config_text->get(prefixes::CONFIG . '_' . $list_name);
 		$list = base64_encode(rawurlencode($list));
 		$this->template->assign_vars(
