@@ -5,8 +5,8 @@ This fork is not ready to use on public/production sites if this note is still p
 
 The fork is intended for:
 
-# Test-integration of various fixes people have worked out to get the extension this working in phpBB 3.3.5 and later.  It has not been tested in this regard with 3.5.13 and later, nor with 3.3.4 or earlier.
-# Implementation of a variety of fixes as well as feature improvements. It has not been tested in this regard with 3.5.6 and later, nor with 3.3.4 or earlier.
+1. Test-integration of various fixes people have worked out to get the extension this working in phpBB 3.3.5 and later.  It has not been tested in this regard with 3.5.13 and later, nor with 3.3.4 or earlier.
+2. Implementation of a variety of fixes as well as feature improvements. It has not been tested in this regard with 3.5.6 and later, nor with 3.3.4 or earlier.
 
 
 Topic Tags 3.0.2
