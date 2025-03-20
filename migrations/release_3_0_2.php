@@ -30,9 +30,13 @@ class release_3_0_2 extends \phpbb\db\migration\migration
 
 	public function update_data()
 	{
-		return array(
-			array('config.update', array(prefixes::CONFIG.'_version', $this->version)),
-		);
+		$re = array();
+
+		$re[] = array('config.remove', array(prefixes::CONFIG.'_convert_space_to_minus', 1));
+		$re[] = array('config.add', array(prefixes::CONFIG.'_convert_space_to_hyphen'));
+		$re[] = array('config.update', array(prefixes::CONFIG.'_version', $this->version));
+
+		return $re;
 	}
 
 }
