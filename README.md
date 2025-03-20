@@ -193,7 +193,8 @@ If you were already using an old version prior to RH Topic Tags v3.0.2, then the
 
 ## Support
 
-https://www.phpbb.com/community/viewtopic.php?f=456&t=2263616
+- https://www.phpbb.com/customise/db/extension/rh_topic_tags/support
+- Older threads: https://www.phpbb.com/community/viewtopic.php?f=456&t=2263616
 
 ## Credits
 
