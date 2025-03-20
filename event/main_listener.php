@@ -330,7 +330,7 @@ class main_listener implements EventSubscriberInterface
 		$page_data['RH_TOPICTAGS'] = base64_encode(rawurlencode(json_encode($tags)));
 
 		$page_data['RH_TOPICTAGS_ALLOWED_TAGS_REGEX'] = $this->config[prefixes::CONFIG . '_allowed_tags_regex'];
-		$page_data['RH_TOPICTAGS_CONVERT_SPACE_TO_MINUS'] = $this->config[prefixes::CONFIG . '_convert_space_to_minus'] ? 'true' : 'false';
+		$page_data['RH_TOPICTAGS_CONVERT_SPACE_TO_HYPHEN'] = $this->config[prefixes::CONFIG . '_convert_space_to_hyphen'] ? 'true' : 'false';
 
 		$page_data['S_RH_TOPICTAGS_WHITELIST_ENABLED'] = $this->config[prefixes::CONFIG . '_whitelist_enabled'];
 
