@@ -4,7 +4,7 @@
 	"description": "Enables tagging of topics",
 	"homepage": "https://github.com/RobertHeim/phpbb-ext-topictags",
 	"version": "3.0.2",
-	"time": "2024-12-17",
+	"time": "2025-03-20",
 	"keywords": [
 		"phpbb",
 		"extension",
@@ -30,7 +30,7 @@
 	],
 	"require": {
 		"php": ">=7.2.0",
-		"phpbb/phpbb": ">=3.3"
+		"phpbb/phpbb": ">=3.3.0"
 	},
 	"require-dev": {
 		"phpbb/epv": "dev-master"
