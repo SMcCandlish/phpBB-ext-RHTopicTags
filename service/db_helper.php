@@ -48,6 +48,9 @@ class db_helper
 	 * array will be simple indexed; when $field_name is an array, this
 	 * function's returned array will be a complex array (of arrays).
 	 *
+	 * This function appears to be "dead code"; no other files in the RH Topic
+	 * Tags extension are calling this function.
+	 *
 	 * @param string $sql			the SQL string the result of which contains
 	 *								 a column named $field_name
 	 * @param string $field_name	the name of the field
