@@ -119,7 +119,7 @@ class topictags_module
 					$max_tags_in_tagcloud = 0;
 				}
 				$config->set(prefixes::CONFIG . '_max_tags_in_tagcloud', $max_tags_in_tagcloud);
-				$config->set(prefixes::CONFIG . '_convert_space_to_minus', $request->variable(prefixes::CONFIG . '_convert_space_to_minus', 1));
+				$config->set(prefixes::CONFIG . '_convert_space_to_hyphen', $request->variable(prefixes::CONFIG . '_convert_space_to_hyphen', 1));
 
 				$deleted_assignments_count = 0;
 				$delete_unused_tags = false;
@@ -188,7 +188,7 @@ class topictags_module
 			'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD'         => $config[prefixes::CONFIG . '_max_tags_in_tagcloud'],
 			'TOPICTAGS_ALLOWED_TAGS_REGEX'           => $config[prefixes::CONFIG . '_allowed_tags_regex'],
 			'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS'   => $config[prefixes::CONFIG . '_allowed_tags_exp_for_users'],
-			'TOPICTAGS_CONVERT_SPACE_TO_MINUS'       => $config[prefixes::CONFIG . '_convert_space_to_minus'],
+			'TOPICTAGS_CONVERT_SPACE_TO_HYPHEN'       => $config[prefixes::CONFIG . '_convert_space_to_hyphen'],
 			'TOPICTAGS_IS_ENABLED_IN_ALL_FORUMS'     => $all_enabled,
 			'TOPICTAGS_IS_DISABLED_IN_ALL_FORUMS'    => $all_disabled,
 			'S_ERROR'                                => (sizeof($errors)) ? true : false,
