@@ -80,31 +80,52 @@ tags-input .tags .tag-item:hover a
 	background-color:	#183e4c;
 }
 
+.tagslist_no_tags
+{
+	text-align: center;
+}
+.tagslist_notes
+{
+	width: 50%;
+	margin: 0 auto;
+	padding-top: 1em;
+}
+
 /* ----------- tag sizes for tag-cloud ----------- */
 
 .rh_topictags_smallest
 {
-	font-size:	x-small;
+	font-size:	105%;
+}
+
+.rh_topictags_smaller
+{
+	font-size:	120%;
 }
  
 .rh_topictags_small
 {
-	font-size:	small;
+	font-size:	135%;
 }
  
 .rh_topictags_medium
 {
-	font-size:	medium;
+	font-size:	170%;
 }
  
 .rh_topictags_large
 {
-	font-size:	large;
+	font-size:	210%;
 }
  
+.rh_topictags_larger
+{
+	font-size:	240%;
+}
+
 .rh_topictags_largest
 {
-	font-size:	x-large;
+	font-size:	275%;
 }
 /* --------- END tag sizes for tag-cloud --------- */
 
