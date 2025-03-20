@@ -23,22 +23,22 @@ $lang = array_merge($lang, array(
 	// Dumbed-down English version (no diacritics, underscores, or dots; has
 	// a min. of 2 chars., for common acronyms like "AI", "UK", etc.):
 	// 'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[a-z0-9\- ]{2,30}$/i',
-	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'Latin-alphabet letters, 0–9, hyphen, space (will be converted to -); min.: 2, max.: 30',
+	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'Latin-alphabet letters, 0–9, hyphen, space (will convert to -); min.: 2, max.: 30',
 	//
-	// Western European version (permits characters with diacritics; has a min.
-	// of 2, for common acronyms like "AI", "UK", etc.):
+	// Default: Western European version (permits characters with diacritics;
+	// has a min. of 2, for common acronyms like "AI", "UK", etc.):
 	'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[\p{Script=Latin}0-9\-_\. ]{2,30}$/u',
-	'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'Latin-alphabet letters, 0–9, hyphen, underscore, dot, space (will be converted to -); min.: 2, max.: 30',
+	'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'Latin-alphabet letters, 0–9, hyphen, underscore, dot, space (will convert to -); min.: 2, max.: 30',
 	//
 	// Western Eurasia version (adds Greek, Cyrillic, and Hebrew support; has
 	// a min. of 2, for common acronyms like "AI", "UK", etc.):
 	// 'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[\p{Script=Latin}\p{Script=Greek}\p{Script=Cyrillic}\p{Script=Hebrew}0-9\-_\. ]{2,30}$/u',
-	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'letters (Latin, Greek, Cyrillic, Hebrew), 0–9, hyphen, underscore, dot, space (will be converted to -); min.: 2, max.: 30',
+	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'letters (Latin, Greek, Cyrillic, Hebrew), 0–9, hyphen, underscore, dot, space (will convert to -); min.: 2, max.: 30',
 	//
 	// Fully internationalized version (has a min. of 1, because in many cases
 	// a CJK ideogram for an entire phrase is a single character):
 	// 'ACP_RH_TOPICTAGS_REGEX_DEFAULT'				=> '/^[\p{L}0-9\-_\. ]{1,30}$/u',
-	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'letters in any language, 0–9, hyphen, underscore, dot, space (will be converted to -); min.: 1, max.: 30',
+	// 'ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'	=> 'letters in any language, 0–9, hyphen, underscore, dot, space (will convert to -); min.: 1, max.: 30',
 	//
 	// As you can see from these, if you need to enable support for something
 	// special, like linguistic or mathematical characters, you just need to
@@ -93,7 +93,7 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_DISPLAY_TAGCOUNT_IN_TAGCLOUD_EXP'	=> 'When enabled, the tag cloud displays for each tag how many topics are tagged with it.',
 
 	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD'			=> 'Max tags in tag cloud',
-	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD_EXP'		=> 'This limits the number of tags shown in the tag cloud to the configured value.',
+	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD_EXP'		=> 'This limits, to the configured value, the number of tags shown in the tag cloud on the index page.<br />It has no effect on the separate tag cloud page, which shows all tags accessible to the user.',
 
 	'TOPICTAGS_DISPLAY_TAGS_IN_VIEWFORUM'		=> 'Display tags in viewforum',
 	'TOPICTAGS_DISPLAY_TAGS_IN_VIEWFORUM_EXP'	=> 'If set to yes, the assigned tags for each topic are shown in topic-lists.',
@@ -133,7 +133,7 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_PRUNE_FORUMS_CONFIRM'	=> 'This will <strong>delete</strong> all tags from all those threads which reside in a forum with tagging disabled.',
 
 	'TOPICTAGS_PRUNE_INVALID_TAGS'				=> 'Prune invalid tags',
-	'TOPICTAGS_PRUNE_INVALID_TAGS_EXP'			=> 'This will delete all tags (and their assignments) that are not valid anymore. This is only required if you changed the regex and want to get rid of the invalid tags.',
+	'TOPICTAGS_PRUNE_INVALID_TAGS_EXP'			=> 'This will <strong>delete</strong> all tags (and their assignments to topics) that are no longer valid.<br />This is only required if you changed the regex and want to get rid of the invalid tags.',
 	'TOPICTAGS_PRUNE_INVALID_TAGS_CONFIRM'		=> 'This will <strong>delete</strong> all tags that do not conform to the configured regex, and can delete a lot of your stuff if you are not careful!',
 
 	'TOPICTAGS_CALC_COUNT_TAGS'					=> 'Recalculate tag counts',
@@ -153,10 +153,10 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_BLACKLIST_EXP'					=> 'List of forbidden tags.<br /><strong>Note</strong>: All tags that do not conform to the regex are always rejected.',
 
 	'TOPICTAGS_ALLOWED_TAGS_REGEX'				=> 'Regular Expression for allowed tags',
-	'TOPICTAGS_ALLOWED_TAGS_REGEX_EXP'			=> '<strong>Warning</strong>: Do not change this if you don’t know what you’re doing. <em>Tags can be 30 characters at maximum, and the delimiter between them in the database is “/”, so that character must not be added to the regex (individually or as part of a class) as permissible in tags.</em> Please consider this during regex design.<br />Note that after a regex change, now-invalid tags are not searchable, but are still displayed in the topics.<br />Consider pruning the invalid tags (see Maintenance section).<br />default: ' . $lang['ACP_RH_TOPICTAGS_REGEX_DEFAULT'],
+	'TOPICTAGS_ALLOWED_TAGS_REGEX_EXP'			=> '<strong>Warning</strong>: Do not change this if you don’t know what you’re doing.<br /><em>Tags can be 30 characters at maximum, and delimiters between them used by the extension for various purposes are “/” and “,”<br />so those characters must not be added to the regex (individually or as part of a class) as permissible in tags.</em><br />After a regex change, now-invalid tags are not searchable, but are still displayed in the topics. To prune invalid tags, see "Maintenance".<br />Default regex: <code>' . $lang['ACP_RH_TOPICTAGS_REGEX_DEFAULT'] . '</code>',
 
-	'TOPICTAGS_CONVERT_SPACE_TO_MINUS'			=> 'Convert “ ” to “-”',
-	'TOPICTAGS_CONVERT_SPACE_TO_MINUS_EXP'		=> 'If set to yes, all spaces (“ ”) are automatically converted to hyphen (“-”).<br /><strong>Note 1</strong>: In the regex, you must allow “-”; otherwise tags with spaces will be rejected.<br /><strong>Note 2</strong>: Existing tags with spaces will <em>not</em> be converted automatically.',
+	'TOPICTAGS_CONVERT_SPACE_TO_HYPHEN'			=> 'Convert “ ” to “-”',
+	'TOPICTAGS_CONVERT_SPACE_TO_HYPHEN_EXP'		=> 'If set to yes, all spaces (“ ”) are automatically converted to hyphen (“-”).<br /><strong>Note 1</strong>: In the regex, you must allow “-”; otherwise tags with spaces will be rejected.<br /><strong>Note 2</strong>: Existing tags with spaces will <em>not</em> be converted automatically.',
 
 	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS'		=> 'Explanation for users',
 	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS_EXP'	=> 'This text is shown to the users and should explain which tags are allowed and which not.<br />default: ' . $lang['ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'],
@@ -177,9 +177,12 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_TAG_DOES_NOT_EXIST'				=> 'The tag “%s” does not exist.',
 	'TOPICTAGS_NO_MODIFICATION'					=> 'The tag was not changed.',
 
-	'TOPICTAGS_SORT_NAME_ASC'					=> 'Tag names A&rarr;Z', // &rarr; is a right-pointing arrow (→)
-	'TOPICTAGS_SORT_NAME_DESC'					=> 'Tag names Z&rarr;A',
-	'TOPICTAGS_SORT_COUNT_ASC'					=> 'Assignments count ascending',
-	'TOPICTAGS_SORT_COUNT_DESC'					=> 'Assignments count descending',
+	'TOPICTAGS_SORT_NAME_ASC'					=> 'Tag names, A&rarr;Z', // &rarr; is a right-pointing arrow (→)
+	'TOPICTAGS_SORT_NAME_DESC'					=> 'Tag names, Z&rarr;A',
+	'TOPICTAGS_SORT_COUNT_ASC'					=> 'Tag uses, least&rarr;most',
+	'TOPICTAGS_SORT_COUNT_DESC'					=> 'Tag uses, most&rarr;least',
+	'TOPICTAGS_SORT_AGE_ASC'					=> 'Tag age, oldest&rarr;newest',
+	'TOPICTAGS_SORT_AGE_DESC'					=> 'Tag age, newest&rarr;oldest',
 
+	'TOPICTAGS_AGE_NOTE'						=> 'Note: Sorting by tag age is really by order of appearance in the database, so it may not always be accurate. If an older tag is merged to a newer one, it takes on the ID and age of the newer one (and vice versa). A database optimisation utility might also upset the apparent tag ages if it re-indexed tags by some new criterion, such as alphabetically.',
 ));
