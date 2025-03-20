@@ -98,7 +98,7 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_DISPLAY_TAGCOUNT_IN_TAGCLOUD_EXP'	=> 'Si l’option est validée, le nuage s’affiche avec une indication du nombre d’utilisations de chaque balise.',
 
 	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD'			=> 'Nombre maxi de balises dans le nuage',
-	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD_EXP'		=> 'Cette option permet de limiter le nombre des balises affichées dans le nuage.',
+	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD_EXP'		=> 'Cela limite, à la valeur configurée, le nombre de balises affichées dans le nuage de balises sur la page d’index.<br />Cela n’a aucun effet sur la « page du nuage de balises » distincte, qui affiche toutes les balises accessibles à l’utilisateur.',
 
 	'TOPICTAGS_DISPLAY_TAGS_IN_VIEWFORUM'		=> 'Affichage des balises dans l’index de chaque forum',
 	'TOPICTAGS_DISPLAY_TAGS_IN_VIEWFORUM_EXP'	=> 'Si l’option est valider, les balises attribuées à chaque sujet sont affichées dans l\index de chaque forum.',
@@ -138,8 +138,8 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_PRUNE_FORUMS_CONFIRM'	=> 'Voulez-vous <strong>supprimer</strong> toutes les balises dans les sujets situés dans des forums avec balisage inhibé ?',
 
 	'TOPICTAGS_PRUNE_INVALID_TAGS'				=> 'Délestage des balises invalides',
-	'TOPICTAGS_PRUNE_INVALID_TAGS_EXP'			=> 'Cette option <strong>supprime</strong> toutes les balises qui ne sont plus valides (ainsi que les attributions à des sujets). Cette opération n’est nécessaire que si vous avez modifié l’expression régulière et si vous voulez vous débarrasser de toutes les balises invalides.',
-	'TOPICTAGS_PRUNE_INVALID_TAGS_CONFIRM'		=> 'Voulez-vous <strong>supprimer</strong> toutes les balises qui ne sont pas conformes à l’expression régulière ? Cela peut supprimer beaucoup de choses si vous ne faites pas attention.',
+	'TOPICTAGS_PRUNE_INVALID_TAGS_EXP'			=> 'Cela <strong>supprimera</strong> toutes les balises (et leurs affectations aux sujets) qui ne sont plus valides.<br />Cette opération n’est nécessaire que si vous avez modifié l’expression régulière et si vous voulez vous débarrasser de toutes les balises invalides.',
+	'TOPICTAGS_PRUNE_INVALID_TAGS_CONFIRM'		=> 'Cela <strong>supprimera</strong> toutes les balises qui ne sont pas conformes à l’expression régulière. Cela peut enlever beaucoup de choses si vous ne faites pas attention !',
 
 	'TOPICTAGS_CALC_COUNT_TAGS'					=> 'Recalculer le nombre de balises',
 	'TOPICTAGS_CALC_COUNT_TAGS_EXP'				=> 'Cette option recalcule le nombre des attributions de chaque balise.',
@@ -158,10 +158,10 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_BLACKLIST_EXP'					=> 'Liste des balises interdites.<br /><strong>Note</strong> : Les balises qui ne sont pas conformes à l’expression régulière sont toujours refusées.',
 
 	'TOPICTAGS_ALLOWED_TAGS_REGEX'				=> 'Expression régulière des balises autorisées',
-	'TOPICTAGS_ALLOWED_TAGS_REGEX_EXP'			=> '<strong>Attention</strong> : Ne changez rien si vous ne savez pas précisément ce que vous faites. <strong>Les balises peuvent contenir 30 caractères au maximum, et le délimiteur entre elles dans la base de données est « / », de sorte que ce caractère ne doit pas être ajouté à l’expression régulière (individuellement ou dans le cadre d’une classe) pour être autorisé dans les balises.</strong>. Tenez-en compte dans l’écriture de l’expression.<br />Notez bien que les balises invalides ne peuvent pas faire l’objet de recherches. Elles restent affichées dans les sujets.<br />Vous pouvez envisager de délester les balises invalides (voir la partie de maintenance).<br />Valeur par défaut : ' . $lang['ACP_RH_TOPICTAGS_REGEX_DEFAULT'],
+	'TOPICTAGS_ALLOWED_TAGS_REGEX_EXP'			=> '<strong>Attention</strong> : Ne changez rien si vous ne savez pas précisément ce que vous faites. <em>Les balises peuvent comporter 30 caractères maximum, et les délimiteurs entre eux utilisés par l’extension à diverses fins sont « / » et « , »,br />de sorte que ces caractères ne doivent pas être ajoutés à l’expression régulière (individuellement ou dans le cadre d’une classe) comme autorisé dans les balises.</em>.<br />Tenez-en compte dans l’écriture de l’expression.<br />Après une modification d’expression régulière, les balises désormais non valides ne peuvent pas faire l’objet d’une recherche, mais sont toujours affichées dans les rubriques.<br />Pour élaguer les balises invalides, consultez « Maintenance ».<br />Expression régulière par défaut : <code>' . $lang['ACP_RH_TOPICTAGS_REGEX_DEFAULT'] . '</code>',
 
-	'TOPICTAGS_CONVERT_SPACE_TO_MINUS'			=> 'Conversion des " " en "-"',
-	'TOPICTAGS_CONVERT_SPACE_TO_MINUS_EXP'		=> 'Si l’option est validée, les espaces sont automatiquement convertis en traits d’union.<br /><strong>Note 1</strong> : Il faut dans ce cas autoriser « - » dans l’expression régulière, faute de quoi les balises contenant des espaces sont refusées.<br /><strong>Note 2</strong> : Les balises préexistantes qui contiennent des espaces ne sont pas converties automatiquement.',
+	'TOPICTAGS_CONVERT_SPACE_TO_HYPHEN'			=> 'Conversion des «   » en « - »',
+	'TOPICTAGS_CONVERT_SPACE_TO_HYPHEN_EXP'		=> 'Si l’option est validée, les espaces sont automatiquement convertis en traits d’union.<br /><strong>Note 1</strong> : Il faut dans ce cas autoriser « - » dans l’expression régulière, faute de quoi les balises contenant des espaces sont refusées.<br /><strong>Note 2</strong> : Les balises préexistantes qui contiennent des espaces ne sont pas converties automatiquement.',
 
 	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS'		=> 'Explication destinée aux utilisateurs',
 	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS_EXP'	=> 'Ce texte est affiché aux utilisateurs et devrait expliquer les balises autorisées et les balises interdites.<br />Valeur par défaut : ' . $lang['ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'],
@@ -182,9 +182,12 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_TAG_DOES_NOT_EXIST'				=> 'La balise "%s" n’existe pas.',
 	'TOPICTAGS_NO_MODIFICATION'					=> 'La balise n’a pas été modifiée.',
 
-	'TOPICTAGS_SORT_NAME_ASC'					=> 'Tri des balises A&rarr;Z', // &rarr; est une flèche pointant vers la droite (→)
-	'TOPICTAGS_SORT_NAME_DESC'					=> 'Tri des balises Z&rarr;A',
-	'TOPICTAGS_SORT_COUNT_ASC'					=> 'Ordre ascendant des attributions',
-	'TOPICTAGS_SORT_COUNT_DESC'					=> 'Ordre descendant des attributions',
+	'TOPICTAGS_SORT_NAME_ASC'					=> 'Noms des balises, A&rarr;Z', // &rarr; est une flèche pointant vers la droite (→)
+	'TOPICTAGS_SORT_NAME_DESC'					=> 'Noms des balises, Z&rarr;A',
+	'TOPICTAGS_SORT_COUNT_ASC'					=> 'Utilisation des balises, moins&rarr;plus',
+	'TOPICTAGS_SORT_COUNT_DESC'					=> 'Utilisation des balises, plus&rarr;moins',
+	'TOPICTAGS_SORT_AGE_ASC'					=> 'Âge des balises, ancienne&rarr;récente',
+	'TOPICTAGS_SORT_AGE_DESC'					=> 'Âge des balises, récente&rarr;ancienne',
 
+	'TOPICTAGS_AGE_NOTE'						=> 'Remarque : Le tri par âge des balises se fait en réalité par ordre d’apparition dans la base de données, il peut donc ne pas toujours être précis. Si une balise plus ancienne est fusionnée avec une plus récente, elle prend l’ID et l’âge de la plus récente (et vice versa). Un utilitaire d’optimisation de base de données pourrait également perturber l’âge apparent des balises s’il réindexait les balises selon un nouveau critère, par exemple par ordre alphabétique.',
 ));
