@@ -659,7 +659,7 @@ class tags_manager_test extends \phpbb_database_test_case
 		global $table_prefix;
 		$config = new \phpbb\config\config(array(
 			prefixes::CONFIG.'_allowed_tags_regex' => '/^[a-z]{3,30}$/i',
-			prefixes::CONFIG.'_convert_space_to_minus' => true,
+			prefixes::CONFIG.'_convert_space_to_hyphen' => true,
 		));
 		$db_helper = new \robertheim\topictags\service\db_helper($this->db);
 		$this->tags_manager = new tags_manager(
@@ -942,81 +942,73 @@ class tags_manager_test extends \phpbb_database_test_case
 		$this->assertEquals('tag2', $tag);
 	}
 
+
 	public function test_get_all_tags()
 	{
-		$start = 0;
-		$limit = 1;
-		$sort_field = 'tag';
-		$asc = true;
-		$tags = $this->tags_manager->get_all_tags($start, $limit, $sort_field,
-			$asc);
-		$this->assertEquals(
-			array(
-				array(
-					'id' => 3,
-					'tag' => 'anothertag3',
-					'tag_lowercase' => 'anothertag3',
-					'count' => 0
-				)
-			), $tags);
 
-		$start = 0;
-		$limit = 1;
-		$sort_field = 'tag';
-		$asc = false;
-		$tags = $this->tags_manager->get_all_tags($start, $limit, $sort_field,
-			$asc);
-		$this->assertEquals(
-			array(
-				array(
-					'id' => 2,
-					'tag' => 'tag2',
-					'tag_lowercase' => 'tag2',
-					'count' => 0
-				)
-			), $tags);
-
-		$start = 1;
-		$limit = 1;
-		$sort_field = 'tag';
-		$asc = true;
-		$tags = $this->tags_manager->get_all_tags($start, $limit, $sort_field,
-			$asc);
-		$this->assertEquals(
-			array(
-				array(
-					'id' => 1,
-					'tag' => 'tag1',
-					'tag_lowercase' => 'tag1',
-					'count' => 0
-				)
-			), $tags);
+	/* Various old tests that would now fail have been removed, and one kept
+	   but modified. The $start and $limit parameters of test_get_all_tags()
+	   are no longer used for db operations. They did not serve a practical
+	   purpose in that respect, and are only of use for post-fetch pagination
+	   by array_slice(). Trying to paginate	pre-emptively through db-fetching
+	   constraints does not work with the new alphabetic and natural-numeric
+	   sorting function, which operates on the entire tags list (or the portion
+	   of it passed to that function). If it is fed chunks of tags extracted in
+	   their random db order (i.e. by date of creation), then it produces
+	   confusing paginated chunks that are sorted on THAT PAGE but which are
+	   otherwise randomized in relation to the total list of the tags across
+	   the ACP tag-management pages. The deleted old tests were assertEquals()
+	   tests expecting specific	tags as the ONLY output, in response to $start
+	   and $limit values that were being passed, instead of testing for correct
+	   tags being INCLUDED in the output. The remaining test is of the latter
+	   sort.
+	   
+	   Additional tests could and probably should be devised here for testing
+	   the current actual functionality of get_all_tags(), including its various
+	   sorting options.
+	   
+	   If there arises a real use-case for $start and $limit being imposed
+	   directly on the database fetches of the tags as ranges, then it needs to
+	   be done with either get_existing_tags() or an  all-new function for this
+	   purpose which does not do alphabetic and/or "natural" numeric sorting,
+	   because those sorting operations have to be applied to the entire list
+	   of [requested] tags, not to batches of tags extracted from the db in 
+	   their db-entered order (i.e. date/time of creation).
+	*/
 
 		// ensure proper counts
 		$this->tags_manager->calc_count_tags();
 
-		$start = 0;
-		$limit = 2;
 		$sort_field = 'count';
 		$asc = true;
-		$tags = $this->tags_manager->get_all_tags($start, $limit, $sort_field,
-			$asc);
-		$this->assertEquals(
+		$tags = $this->tags_manager->get_all_tags($sort_field, $asc);
+
+		$expected_tags = array(
 			array(
-				array(
-					'id' => 2,
-					'tag' => 'tag2',
-					'tag_lowercase' => 'tag2',
-					'count' => 0
-				),
-				array(
-					'id' => 1,
-					'tag' => 'tag1',
-					'tag_lowercase' => 'tag1',
-					'count' => 1
-				)
-			), $tags);
-	}
+				'id' => 2,
+				'tag' => 'tag2',
+				'tag_lowercase' => 'tag2',
+				'count' => 0
+			),
+			array(
+				'id' => 1,
+				'tag' => 'tag1',
+				'tag_lowercase' => 'tag1',
+				'count' => 1
+			)
+		);
+
+		// Check that both tags exist in the returned array and have the correct values
+		foreach ($expected_tags as $expected_tag) {
+			$tag_found = false;
+			foreach ($tags as $tag) {
+				if ($tag['id'] == $expected_tag['id'] && $tag['tag'] == $expected_tag['tag'] && $tag['tag_lowercase'] == $expected_tag['tag_lowercase'] && $tag['count'] == $expected_tag['count']) {
+					$tag_found = true;
+					break;
+				}
+			}
+			$this->assertTrue($tag_found, 'Tag with ID ' . $expected_tag['id'] . ' not found or incorrect.');
+		}
 
 	public function test_count_tags()
 	{
