@@ -96,7 +96,7 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_DISPLAY_TAGCOUNT_IN_TAGCLOUD_EXP'	=> 'Cuando se habilita la nube de etiqueta muestra cuántos temas se marcan con cada etiqueta',
 
 	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD'			=> 'Max. etiquetas en la nube de etiquetas',
-	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD_EXP'		=> 'Esto limita el número de etiquetas que se muestran en la nube de etiquetas con el valor configurado.',
+	'TOPICTAGS_MAX_TAGS_IN_TAGCLOUD_EXP'		=> 'Esto limita, al valor configurado, el número de etiquetas que se muestran en la nube de etiquetas en la página de índice.<br />No tiene ningún efecto en la página independiente de la nube de etiquetas, que muestra todas las etiquetas a las que puede acceder el usuario.',
 
 	'TOPICTAGS_DISPLAY_TAGS_IN_VIEWFORUM'		=> 'Mostrar etiquetas viendo un foro',
 	'TOPICTAGS_DISPLAY_TAGS_IN_VIEWFORUM_EXP'	=> 'Si se establece en sí, las etiquetas asignadas para cada tema se muestran en la lista de tema.',
@@ -136,8 +136,8 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_PRUNE_FORUMS_CONFIRM'	=> 'Esto ELIMINARÁ todas las etiquetas de todos los hilos que residen en un foro con etiquetado deshabilitado.',
 
 	'TOPICTAGS_PRUNE_INVALID_TAGS'				=> 'Limpiar etiquetas no válidas',
-	'TOPICTAGS_PRUNE_INVALID_TAGS_EXP'			=> 'Esto ELIMINARÁ todas las etiquetas (y sus asignaciones) que no son válidas. Esto sólo es necesario si ha cambiado la expresión regular y quiere deshacerse de las etiquetas no válidas. Tenga en cuenta que las etiquetas no válidas no se pueden buscar, pero todavía se muestran en los temas.',
-	'TOPICTAGS_PRUNE_INVALID_TAGS_CONFIRM'		=> '¡Esto ELIMINARÁ todas las etiquetas que no están conformes con la configuración de expresión regular y puede eliminar una gran cantidad de su material si no tienes cuidado!',
+	'TOPICTAGS_PRUNE_INVALID_TAGS_EXP'			=> 'Esto <strong>eliminará</strong> todas las etiquetas (y sus asignaciones a temas) que ya no sean válidas.<br />Esto sólo es necesario si ha cambiado la expresión regular y quiere deshacerse de las etiquetas no válidas.',
+	'TOPICTAGS_PRUNE_INVALID_TAGS_CONFIRM'		=> '¡Esto <strong>eliminará</strong> todas las etiquetas que no están conformes con la configuración de expresión regular y puede eliminar una gran cantidad de su material si no tienes cuidado!',
 
 	'TOPICTAGS_CALC_COUNT_TAGS'					=> 'Recalcular el contador de etiquetas',
 	'TOPICTAGS_CALC_COUNT_TAGS_EXP'				=> 'Esto volverá a calcular con qué frecuencia se usa cada etiqueta.',
@@ -156,10 +156,10 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_BLACKLIST_EXP'					=> 'Lista de etiquetas prohibidas.<br /><strong>Nota</strong>: Todas las etiquetas que no están conformes con la expresión regular siempre serán rechazadas.',
 
 	'TOPICTAGS_ALLOWED_TAGS_REGEX'				=> 'Expresión regular para etiquetas permitidas',
-	'TOPICTAGS_ALLOWED_TAGS_REGEX_EXP'			=> '<strong>Advertencia</strong>: No cambie esto, si no sabe lo que está haciendo. <strong>Las etiquetas pueden tener un máximo de 30 caracteres y el delimitador entre ellas en la base de datos es “/”, por lo que ese carácter no debe agregarse a la expresión regular (individualmente o como parte de una clase) para que sea permisible en las etiquetas.</strong> Por favor considere esto durante el diseño de expresiones regulares.<br />Tenga en cuenta que las etiquetas no válidas, no se pueden buscar después, pero todavía se muestran en los temas.<br />Considere la limpieza de las etiquetas no válidas (ver sección de Mantenimiento).<br />Por defecto: ' . $lang['ACP_RH_TOPICTAGS_REGEX_DEFAULT'],
+	'TOPICTAGS_ALLOWED_TAGS_REGEX_EXP'			=> '<strong>Advertencia</strong>: No cambie esto, si no sabe lo que está haciendo. <em>Las etiquetas pueden tener un máximo de 30 caracteres, y los delimitadores entre ellos utilizados por la extensión para diversos propósitos son "/" y ","<br />por lo que esos caracteres no deben agregarse a la expresión regular (individualmente o como parte de una clase) como se permite en las etiquetas.</em> Por favor considere esto durante el diseño de expresiones regulares.<br />Después de un cambio de expresión regular, las etiquetas que ahora no son válidas no se pueden buscar, pero aún se muestran en los temas. Para podar etiquetas no válidas, consulte "Mantenimiento").<br />Expresión regular predeterminada:  <code>' . $lang['ACP_RH_TOPICTAGS_REGEX_DEFAULT'] . '</code>',
 
-	'TOPICTAGS_CONVERT_SPACE_TO_MINUS'			=> 'Convertir “ ” a “-”',
-	'TOPICTAGS_CONVERT_SPACE_TO_MINUS_EXP'		=> 'Si se establece en sí, todos los espacios (“ ”) se convierten automáticamente a guión (“-”).<br /><strong>Nota 1</strong>: En la expresión regular se debe permitir “-”; de lo contrario se rechazarán las etiquetas con espacios en blanco.<br /><strong>Nota 2</strong>: Las etiquetas existentes con espacios NO se convertirán automáticamente.',
+	'TOPICTAGS_CONVERT_SPACE_TO_HYPHEN'			=> 'Convertir “ ” a “-”',
+	'TOPICTAGS_CONVERT_SPACE_TO_HYPHEN_EXP'		=> 'Si se establece en sí, todos los espacios (“ ”) se convierten automáticamente a guión (“-”).<br /><strong>Nota 1</strong>: En la expresión regular se debe permitir “-”; de lo contrario se rechazarán las etiquetas con espacios en blanco.<br /><strong>Nota 2</strong>: Las etiquetas existentes con espacios NO se convertirán automáticamente.',
 
 	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS'		=> 'Explicación para los usuarios',
 	'TOPICTAGS_ALLOWED_TAGS_EXP_FOR_USERS_EXP'	=> 'Este texto se muestra a los usuarios y debe explicar qué etiquetas se permiten, y cuáles no.<br />Por defecto: ' . $lang['ACP_RH_TOPICTAGS_REGEX_EXP_FOR_USERS_DEFAULT'],
@@ -180,9 +180,12 @@ $lang = array_merge($lang, array(
 	'TOPICTAGS_TAG_DOES_NOT_EXIST'				=> 'La etiqueta “%s” no existe.',
 	'TOPICTAGS_NO_MODIFICATION'					=> 'La etiqueta no fue cambiada.',
 
-	'TOPICTAGS_SORT_NAME_ASC'					=> 'Nombre de etiqueta A&rarr;Z', // &rarr; es una flecha que apunta hacia la derecha (→)
-	'TOPICTAGS_SORT_NAME_DESC'					=> 'Nombre de etiqueta Z&rarr;A',
-	'TOPICTAGS_SORT_COUNT_ASC'					=> 'Orden de asignaciones ascendente',
-	'TOPICTAGS_SORT_COUNT_DESC'					=> 'Orden de asignaciones descendente',
+	'TOPICTAGS_SORT_NAME_ASC'					=> 'Nombres de etiquetas, A&rarr;Z', // &rarr; es una flecha que apunta hacia la derecha (→)
+	'TOPICTAGS_SORT_NAME_DESC'					=> 'Nombres de etiquetas, Z&rarr;A',
+	'TOPICTAGS_SORT_COUNT_ASC'					=> 'Uso de etiquetas, menor&rarr;mayor',
+	'TOPICTAGS_SORT_COUNT_DESC'					=> 'Uso de etiquetas, mayor&rarr;menor',
+	'TOPICTAGS_SORT_AGE_ASC'					=> 'Antigüedad de etiquetas, antigua&rarr;nueva',
+	'TOPICTAGS_SORT_AGE_DESC'					=> 'Antigüedad de etiquetas, nueva&rarr;antigua',
 
+	'TOPICTAGS_AGE_NOTE'						=> 'Nota: La clasificación por antigüedad de la etiqueta es realmente por orden de aparición en la base de datos, por lo que puede que no siempre sea precisa. Si una etiqueta antigua se fusiona con una más nueva, adopta el ID y la antigüedad de la más nueva (y viceversa). Una utilidad de optimización de bases de datos también podría alterar la antigüedad aparente de las etiquetas si volviera a indexar las etiquetas según algún criterio nuevo, como alfabéticamente.',
 ));
