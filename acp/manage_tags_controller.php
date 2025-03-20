@@ -35,6 +35,9 @@ class manage_tags_controller
 	/** @var \phpbb\pagination */
 	private $pagination;
 
+	/** @var \phpbb\language\language */
+	private $language;
+
 	/** @var \robertheim\topictags\service\tags_manager */
 	private $tags_manager;
 
@@ -43,6 +46,8 @@ class manage_tags_controller
 	const SORT_NAME_DESC  = 1;
 	const SORT_COUNT_ASC  = 2;
 	const SORT_COUNT_DESC = 3;
+	const SORT_AGE_ASC   = 4;
+	const SORT_AGE_DESC  = 5;
 
 	public function __construct(
 		\phpbb\config\config $config,
@@ -50,14 +55,17 @@ class manage_tags_controller
 		\phpbb\user $user,
 		\phpbb\template\template $template,
 		\phpbb\pagination $pagination,
-		\robertheim\topictags\service\tags_manager $tags_manager)
+		\phpbb\language\language $language,
+		\robertheim\topictags\service\tags_manager $tags_manager
+	)
 	{
-		$this->config = $config;
-		$this->request = $request;
-		$this->user = $user;
-		$this->template = $template;
-		$this->pagination = $pagination;
-		$this->tags_manager = $tags_manager;
+		$this->config		= $config;
+		$this->request		= $request;
+		$this->user			= $user;
+		$this->template		= $template;
+		$this->pagination	= $pagination;
+		$this->language		= $language;
+		$this->tags_manager	= $tags_manager;
 	}
 
 	/**
@@ -81,14 +89,20 @@ class manage_tags_controller
 			break;
 			default:
 				// show all tags
+				$sort_field = 'tag'; // Set as a default.
 				$sort_key = $this->request->variable('sort_key', self::SORT_NAME_ASC);
-				$sort_field = 'tag';
+				 // Set as a default.
 				switch ($sort_key)
 				{
 					case self::SORT_COUNT_ASC:
 					// no break
 					case self::SORT_COUNT_DESC:
 						$sort_field = 'count';
+					break;
+					case self::SORT_AGE_ASC:
+					// no break
+					case self::SORT_AGE_DESC:
+						$sort_field = 'id';
 					break;
 					case self::SORT_NAME_ASC:
 					// no break
@@ -99,14 +113,14 @@ class manage_tags_controller
 					break;
 				}
 
-				$ordering = (($sort_key % 2) == self::SORT_ASC);
+				$asc = (($sort_key % 2) == self::SORT_ASC);
 				$start = $this->request->variable('start', 0);
 				$limit = $this->config['topics_per_page'];
 				$tags_count = $this->tags_manager->count_tags();
 				$start = $this->pagination->validate_start($start, $limit, $tags_count);
 				$base_url = $u_action . "&amp;sort_key=$sort_key";
 
-				$tags = $this->tags_manager->get_all_tags($start, $limit, $sort_field, $ordering);
+				$tags = $this->tags_manager->get_all_tags($start, $limit, $sort_field, $asc);
 
 				$this->pagination->generate_template_pagination($base_url, 'pagination', 'start', $tags_count, $limit, $start);
 				foreach ($tags as $tag)
@@ -308,6 +322,8 @@ class manage_tags_controller
 			self::SORT_NAME_DESC  => $this->user->lang('TOPICTAGS_SORT_NAME_DESC'),
 			self::SORT_COUNT_ASC  => $this->user->lang('TOPICTAGS_SORT_COUNT_ASC'),
 			self::SORT_COUNT_DESC => $this->user->lang('TOPICTAGS_SORT_COUNT_DESC'),
+			self::SORT_AGE_ASC    => $this->user->lang('TOPICTAGS_SORT_AGE_ASC'),
+			self::SORT_AGE_DESC   => $this->user->lang('TOPICTAGS_SORT_AGE_DESC'),
 		);
 
 		foreach ($sort_keys as $key => $text)
