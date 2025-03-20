@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/RobertHeim/phpbb-ext-topictags.svg?branch=master)](https://travis-ci.org/RobertHeim/phpbb-ext-topictags)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/RobertHeim/phpbb-ext-topictags/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/RobertHeim/phpbb-ext-topictags/?branch=master)
 
+<div style="float:right;">[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/smccandlish)</div>
+
 This fork is not ready to use on public/production sites if this note is still present here.
 
 The fork is intended for:
