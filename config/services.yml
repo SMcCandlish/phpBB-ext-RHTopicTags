@@ -47,6 +47,8 @@ services:
             - '@config'
             - '@config_text'
             - '@auth'
+            - '@language'
+            - '@user'
             - '@robertheim.topictags.db_helper'
             - '%core.table_prefix%'
     robertheim.topictags.tagcloud_manager:
@@ -59,6 +61,7 @@ services:
             - '@controller.helper'
             - '%core.table_prefix%'
             - '@robertheim.topictags.tags_manager'
+            - '@robertheim.topictags.db_helper'
     robertheim.topictags.acp.manage_tags_controller:
         class: robertheim\topictags\acp\manage_tags_controller
         arguments:
@@ -67,6 +70,7 @@ services:
             - '@user'
             - '@template'
             - '@pagination'
+            - '@language'
             - '@robertheim.topictags.tags_manager'
     robertheim.topictags.acp.white_and_blacklist_controller:
         class: robertheim\topictags\acp\white_and_blacklist_controller
