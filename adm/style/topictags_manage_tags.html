@@ -1,3 +1,4 @@
+<!-- INCLUDECSS @robertheim_topictags/rh_topictags.css -->
 <!-- INCLUDE overall_header.html -->
 
 <!-- INCLUDEJS jquery.jeditable.mini.js -->
@@ -78,7 +79,7 @@ var rh_topictags_lang_cancel = '{LA_CANCEL}';
 		</tr>
 		<!-- BEGINELSE -->
 		<tr>
-			<td colspan="3" style="text-align: center;">{L_TOPICTAGS_NO_TAGS}</td>
+			<td class="tagslist_no_tags" colspan="3">{L_TOPICTAGS_NO_TAGS}</td>
 		</tr>
 		<!-- END tags -->
 	</tbody>
@@ -90,6 +91,10 @@ var rh_topictags_lang_cancel = '{LA_CANCEL}';
 	{S_FORM_TOKEN}
 </fieldset>
 </form>
+
+<div class="tagslist_notes">
+<p>{L_TOPICTAGS_AGE_NOTE}</p>
+</div>
 
 <!-- ENDIF -->
 
