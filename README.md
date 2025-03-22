@@ -77,7 +77,7 @@ Clone (or download and move/upload) the repository into a subdirectory of your p
 
 ```
 cd ext/
-git clone https://github.com/SMcCandlish/phpbb-ext-topictags.git robertheim/topictags/
+git clone https://github.com/SMcCandlish/phpBB-ext-RHTopicTags.git robertheim/topictags/
 ```
 
 We are using the original `robertheim/` path name because most of the code is his, and you cannot run this copy and the origial by RH at the same time, so there's no reason not to directly replace the original. 
@@ -181,7 +181,7 @@ mv topictags ~/
 
 Then re-download the current version (while still in the `ext/robertheim/` directory) with:
 
-`git clone https://github.com/SMcCandlish/phpbb-ext-topictags.git topictags/`
+`git clone https://github.com/SMcCandlish/phpBB-ext-RHTopicTags.git topictags/`
 
 (or download it to your local computer and copy the files over by SFTP, SCP, or whatever means you use for this purpose).
 
