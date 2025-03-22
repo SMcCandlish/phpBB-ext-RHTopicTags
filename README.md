@@ -138,7 +138,7 @@ div.tags
 
 .ng-valid
 {
-    background-color:	#323D43;
+	background-color:	#323D43;
 }
 
 .tag-item
