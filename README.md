@@ -98,10 +98,10 @@ Depending on your phpBB version, you may find a "Purge the cache" option at AGP 
 Go to ACP &gt; tab Extensions &gt; RH Topic Tags.
 
 One **important thing to check for and fix**: at ACP &gt; Extensions &gt; RH Topic Tags &gt; Settings &gt; Tag settings, look in the regex field for "Regular Expression for allowed tags:", and if you see `\\s` change it to `\s`, and same with any other other cases of `\\` which must be changed to `\`. By default, these will be `\\p` → `\p`, `\\s` → `\s`, and `\\-` → `\-`. There seems to be a "translation" problem somewhere between PHP, JS, and SQL that is extra-escaping `\` and turning it into `\\`, which will break our character-matching intentions. 
-1. Special case exception: if you customized the regex in any `/robertheim/topictags/language/xx/topictags_acp.php` file to explicitly permit the `\` character in tags, that would have been coded as `\\`, which in this field may show up as `\\\\` or `\\\` and needs to be changed back to `\\`. 
+1. Special case exception: if you customized the regex in any `ext/robertheim/topictags/language/xx/topictags_acp.php` file to explicitly permit the `\` character in tags, that would have been coded as `\\`, which in this field may show up as `\\\\` or `\\\` and needs to be changed back to `\\`. 
 2. Special case exception: If you attempted to permit `/` (perhaps as `\/`), this **must be removed** because the delimiter between tags in some parts of the code is `/` (no tag itself can contain `/`). Likewise, you must not permit `,` (including as `\,`) because that character is used as the delimiter by the `https://yoursite.com/tag/tag1,tag2` search functionality. This issue may be examined in the future to see if it can be worked around and these characters become permissible in tags.
 
-For some tips on customizing your regex, see the extensive comment documentation inside `/robertheim/topictags/language/en/topictags_acp.php` (or the `es`, `fr`, or `ru` version).
+For some tips on customizing your regex, see the extensive comment documentation inside `ext/robertheim/topictags/language/en/topictags_acp.php` (or the `es`, `fr`, or `ru` version).
 
 When done, submit the changes with the button at the bottom of the page.
 
