@@ -24,43 +24,43 @@ phpBB 3.3.x extension (expected to be compatible with at least 3.3.5 through 3.3
 
 ### Common
 
-- add searchable tags when posting a new topic
-- get tag suggestions based on existing tags
-- edit tags when editing first post of topic
-- SEO: tags are added to meta-content keywords in viewtopic
-- tags are shown in viewforum (can be disabled in ACP)
-- enable tagging of topics on a per-forum basis
-- responsive layout
-- full UTF-8 support
-- Tag cloud feature (can be disabled in ACP as to display on index or entirely)
+- Add searchable tags when posting a new topic.
+- Get tag suggestions based on existing tags.
+- Edit tags when editing first post of topic.
+- SEO: tags are added to meta-content keywords in viewtopic.
+- Tags are shown in viewforum (can be disabled in ACP).
+- Enable tagging of topics on a per-forum basis.
+- Responsive layout.
+- Full UTF-8 support.
+- Tag cloud feature (can be disabled in ACP as to display on index, or entirely).
 
 ### Search
-- search topics by tag(s)
+- Search topics by tag(s)
 - `/tag/{tags}/{boolean}/{case-sensitivity}` shows topics tagged with all (boolean = `AND`, the default) or any (boolean = `OR`) of the given tags, where tags are comma separated tags and case-sensitivity can be `true` to search case-sensitive or `false` (the default), e.g.:
  - `/tag/tag1,tag2/OR` lists topics that are tagged with tag1 OR tag2 OR tAG2
  - `/tag/tag1,tag2/AND` lists topics that are tagged with \[tag1 AND (tag2 OR tAG2)\]
  - `/tag/tag1,tag2` lists topics that are tagged with \[tag1 AND (tag2 OR tAG2)\] (boolean=default=`AND`, case-sensitivity=default=`false`)
  - `/tag/tag1,tAG2/AND/true` lists topics that are tagged with (tag1 AND tAG2, but will not match tag2)
- - tags are essentially case-insensitive by default (if you create a tag "foo", then "Foo" or "FOO" or "fOO" will be the same tag); the case-sensitivity search feature is primarily of use for finding tags that are inappropriately upper-case ("Dogs") or inappropriately lower-case ("europe") in their database-registered form.
+ - Tags are essentially case-insensitive by default (if you create a tag "foo", then "Foo" or "FOO" or "fOO" will be the same tag); the case-sensitivity search feature is primarily of use for finding tags that are inappropriately upper-case ("Dogs") or inappropriately lower-case ("europe") in their database-registered form.
 
 ### Tag-Cloud
 - `/tags` (plural) shows a tag cloud
-- ACP option for tag cloud to be displayed on the board index page or not
-- ACP option to limit count of tags shown in tag cloud on the index page
-- dynamic tag-size in tag cloud depending on its usage count
-- ACP option to also enable/disable display of tags' numeric usage counts in tag cloud
+- ACP option for tag cloud to be displayed also on the board index page.
+- ACP option to limit count of tags shown in tag cloud on the index page.
+- Dynamic tag-size in tag cloud depending on tags' usage counts.
+- ACP option to also enable/disable display of tags' numeric usage counts in tag cloud.
 
 ### Advanced configuration
-- configure a regex to decide which tags are valid and which are not
-- maintenance functions in ACP &gt; Extensions &gt; RH Topic Tags
-- tag whitelist
-- tag blacklist
-- user and mod+admin permissions for who can add/edit tags
-- spaces in tags are converted to "-" by default (you can disable that in ACP)
-- manage existing tags in ACP
- - delete tag
- - rename tag
- - merge tags (rename one tag to the same name as another tag and they will automatically be merged)
+- Configure a regex to decide which characters are valid in tags.
+- Maintenance functions in ACP &gt; Extensions &gt; RH Topic Tags.
+- Tag whitelist.
+- Tag blacklist.
+- User and mod+admin permissions for who can add/edit tags.
+- Spaces in tags are converted to "-" by default (you can disable that in ACP).
+- Manage existing tags in ACP:
+ - Rename tag.
+ - Delete tag.
+ - Merge tags (rename one tag to the same name as another and they will automatically be merged).
 
 ## Compatibility
 
