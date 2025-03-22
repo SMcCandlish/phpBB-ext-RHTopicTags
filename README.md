@@ -210,7 +210,7 @@ If you were already using an old version prior to RH Topic Tags v3.0.2, then the
 - mi1eurista @ GitHub, for integrating several of the above tweaks into a single patch (which RH never got around to integrating).
 - andrigamerita and Fantabulum @ GitHub, for confirming functionality of basic fixes in phpBB 3.3.10 and 3.3.12.
 - iandoug @ phpBB.com, for figuring out where the regex stuff is to control what characters are permitted in tags.
-- combuster @ phpBB.com, for documenting that the phpBB cache has to be cleared or malfunctions will occur.
+- combuster @ phpBB.com (who seems to be Robert Heim), for documenting that the phpBB cache has to be cleared or malfunctions will occur.
 - Finally, S. McCandlish (SMcCandlish @ GitHub) for bashing and munging on this to behave better in 2025 onward.
 
 ## Change log for 3.0.2
