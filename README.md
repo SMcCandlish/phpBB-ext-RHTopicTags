@@ -185,7 +185,7 @@ Then re-download the current version (while still in the `ext/robertheim/` direc
 
 (or download it to your local computer and copy the files over by SFTP, SCP, or whatever means you use for this purpose).
 
-Either way, now go to ACP &gt; tab Customise &gt; Manage extensions &gt; RH Topic Tags &ngt; enable.
+Either way, now go to ACP &gt; tab Customise &gt; Manage extensions &gt; RH Topic Tags &gt; enable.
 
 Then purge the cache again as described above.
 
