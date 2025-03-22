@@ -116,7 +116,7 @@ A point of confusion to look out for: A topic's tags are *shown* on the first po
 
 If the extension does not work for you, make sure you purged the cache. Next, check that the forum you are trying to use it in has permissions set to use this extension (either individually in that forum's configuration, or by turning on the feature everywhere (ACP &gt; tab Extensions &gt;  RH Topic Tags &gt; Settings &gt; Configuration &gt; Enable RH Topic Tags in all forums). Failing that, ensure that the filesystem permissions on the extension's files are correct (must be readable by whatever operating-system user the webserver runs as, and/or by its group). And ensure that the path to it is correct, at `ext/robertheim/topictags/` in your phpBB setup, not at something like `ext/topictags/`. And that you user account has permission to create/edit tags.
 
-If you are using phpBB 3.3.8 or later, *and* it is not working properly for you, see if any recent-ish communication at https://www.phpbb.com/customise/db/extension/rh_topic_tags/support addresses the issue yet. When reporting an issue, be as specific as possible; no one can read your mind, or your logs.
+If you are using phpBB 3.3.8 or later, *and* it is not working properly for you, see if any recent-ish communication at https://www.phpbb.com/community/viewtopic.php?t=2661331 or https://www.phpbb.com/customise/db/extension/rh_topic_tags/support addresses the issue yet. When reporting an issue, be as specific as possible; no one can read your mind, or your logs.
 
 Two alleged but dubious fixes for some phpBB 3.3.8 compatibility issues were posted in a 2022 third-party attempt at phpBB 3.3.8 compatibility, but based on RH's old branch for phpBB 3.1.x instead of the master (for phpBB 3.3.x). Someone later, working toward phpBB 3.3.9 compatibility, reverted the first of those suggested changes but kept the second (and cleaned up some of the directory structure). Another, for phpBB 3.3.9, reverted both (without the directory cleanup), and their change was accepted into RH's main branch, with others reporting it working with versions as late as phpBB 3.3.12. Someone later yet, for phpBB 3.3.10, also reverted both of the above changes in their own fork, but kept the cleaned-up directory structure.
 
@@ -193,7 +193,8 @@ If you were already using an old version prior to RH Topic Tags v3.0.2, then the
 
 ## Support
 
-- https://www.phpbb.com/customise/db/extension/rh_topic_tags/support
+- Development, bug reports: https://www.phpbb.com/community/viewtopic.php?t=2661331
+- General: https://www.phpbb.com/customise/db/extension/rh_topic_tags/support
 - Older threads: https://www.phpbb.com/community/viewtopic.php?f=456&t=2263616
 
 ## Credits
