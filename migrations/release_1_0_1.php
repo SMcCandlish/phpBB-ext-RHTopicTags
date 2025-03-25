@@ -31,7 +31,7 @@ class release_1_0_1 extends \phpbb\db\migration\migration
 	public function update_data()
 	{
 		global $config;
-		// put white- and blacklist from config to config_text
+		// Move white- and blacklist from config to config_text
 		$whitelist = $config[prefixes::CONFIG.'_whitelist'];
 		$blacklist = $config[prefixes::CONFIG.'_blacklist'];
 		return array(
