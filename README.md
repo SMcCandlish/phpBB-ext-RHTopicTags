@@ -22,7 +22,7 @@ phpBB 3.3.x extension (expected to be compatible with at least 3.3.5 through 3.3
 
 ## Features
 
-### Common
+### Basic
 
 - Add searchable tags when posting a new topic.
 - Get tag suggestions based on existing tags.
@@ -43,7 +43,7 @@ phpBB 3.3.x extension (expected to be compatible with at least 3.3.5 through 3.3
  - `/tag/tag1,tAG2/AND/true` lists topics that are tagged with (tag1 AND tAG2, but will not match tag2)
  - Tags are essentially case-insensitive by default (if you create a tag "foo", then "Foo" or "FOO" or "fOO" will be the same tag); the case-sensitivity search feature is primarily of use for finding tags that are inappropriately upper-case ("Dogs") or inappropriately lower-case ("europe") in their database-registered form.
 
-### Tag-Cloud
+### Tag cloud
 - `/tags` (plural) shows a tag cloud
 - ACP option for tag cloud to be displayed also on the board index page.
 - ACP option to limit count of tags shown in tag cloud on the index page.
@@ -64,7 +64,7 @@ phpBB 3.3.x extension (expected to be compatible with at least 3.3.5 through 3.3
 
 ## Compatibility
 
-This extension is known-working in phpBB 3.3.5, and refines code working up to at least phpBB 3.3.12.  It may work in earlier or later 3.3.x versions, but has not been tested in them. This is coded with a "soft dependency" on 3.3.5. If you want to try it in an earlier version and can't despite "softness" of that requirement, just change `3.3.5` to `3.3.0` in the extension's `composer.json`.
+This extension is known-working in phpBB 3.3.5, and is also tested some in phbBB 3.3.14. It refines code working up to at least phpBB 3.3.12.  It may work in earlier or later 3.3.x versions, but has not been tested in them. This is coded with a "soft dependency" on 3.3.5. If you want to try it in an earlier version and can't despite "softness" of that requirement, just change `3.3.5` to `3.3.0` in the extension's `composer.json`.
 
 ## Installation
 
@@ -77,7 +77,7 @@ Clone (or download and move/upload) the repository into a subdirectory of your p
 
 ```
 cd ext/
-git clone https://github.com/SMcCandlish/phpBB-ext-RHTopicTags.git robertheim/topictags/
+git clone -b master --single-branch https://github.com/SMcCandlish/phpBB-ext-RHTopicTags.git robertheim/topictags/
 ```
 
 We are using the original `robertheim/` path name because most of the code is his, and you cannot run this copy and the origial by RH at the same time, so there's no reason not to directly replace the original. 
@@ -91,7 +91,7 @@ Go to ACP &gt; tab Forums, and edit any forum (or create a test one); click the 
 
 ### 2.5. Purge phpBB cache
 
-Depending on your phpBB version, you may find a "Purge the cache" option at AGP &gt; Admin Index (which is at top right of the AGP window, or click tab General to get to same page). Otherwise, you may find a "Purge cache" option in the left menu at AGP &gt; General. If you do not, you might have to login to your server via FTP/FTPS/SFTP/SSH, and delete the contents of `phpbb/cache/` *except* for `index.htm` and `.htaccess`. If you find no such files there and instead find a `driver/` subdirectory and a `service.php` file, then delete nothing (you have a different version of phpBB).
+Depending on your phpBB version, you may find a "Purge the cache" option at AGP &gt; Admin Index (which is at top right of the AGP window, or click tab General to get to same page). Otherwise, you may find a "Purge cache" option in the left menu at AGP &gt; General. If you do not, you might have to login to your server via FTP/FTPS/SFTP/SSH, and delete the contents of `cache/production/` (where `cache/` is at the same directory level as `ext/` and `phpbb/`; do not delete from `phpbb/cache/`, where the cache control files are not the cache files).
 
 ### 3. Configure
 
@@ -120,7 +120,7 @@ If you are using phpBB 3.3.8 or later, *and* it is not working properly for you,
 
 Two alleged but dubious fixes for some phpBB 3.3.8 compatibility issues were posted in a 2022 third-party attempt at phpBB 3.3.8 compatibility, but based on RH's old branch for phpBB 3.1.x instead of the master (for phpBB 3.3.x). Someone later, working toward phpBB 3.3.9 compatibility, reverted the first of those suggested changes but kept the second (and cleaned up some of the directory structure). Another, for phpBB 3.3.9, reverted both (without the directory cleanup), and their change was accepted into RH's main branch, with others reporting it working with versions as late as phpBB 3.3.12. Someone later yet, for phpBB 3.3.10, also reverted both of the above changes in their own fork, but kept the cleaned-up directory structure.
 
-This version takes the last of these approaches, and goes further, and these changes are all entirely working as far back as phpBB 3.3.5, but have not yet been tested in later versions.
+This version takes the last of these approaches, and goes further, and these changes are all entirely working in phpBB 3.3.14 (current as of this writing) and as far back as phpBB 3.3.5, but have not yet been tested in intermediate versions.
 
 ### 5. Customizing for themes
 
@@ -181,7 +181,7 @@ mv topictags ~/
 
 Then re-download the current version (while still in the `ext/robertheim/` directory) with:
 
-`git clone https://github.com/SMcCandlish/phpBB-ext-RHTopicTags.git topictags/`
+`git clone -b master --single-branch https://github.com/SMcCandlish/phpBB-ext-RHTopicTags.git topictags/`
 
 (or download it to your local computer and copy the files over by SFTP, SCP, or whatever means you use for this purpose).
 
@@ -217,7 +217,7 @@ If you were already using an old version prior to RH Topic Tags v3.0.2, then the
 ## Change log for 3.0.2
 
 - Updated `README.md` to account for all of the changes, and to just read better.
-- Fixed the stupendous security/privacy problem of the tag cloud being visible (in two different ways) to non-logged-in visitors. Various sites could be using this software for sensitive information, especially in an intranet circumstance (client names, internal project code-names, etc.).
+- Fixed the stupendous security/privacy problem of the tag cloud being always visible (in two different ways) to non-logged-in visitors. Various sites could be using this software for sensitive information, especially in an intranet circumstance (client names, internal project code-names, etc.).
 - Fixed additional security problem that tags in the cloud were not access controlled even for logged in users, such that low-access users could see names of tags that only existed in forums they had no access to, and were given tag-usage counts that included uses in forums they had no access to; this leaked both private tag names and revealed that there were forums the user wasn't intended to even know existed.
 - Tweaked `event/main_listener.php` for compatibility with later versions of phpBB 3.3.x.
 - Rearranged the codebase in ways (figured out by others credited above) that resolve problems with later versions of phpBB 3.3.x (e.g. due to having files stuck in `styles/all/angular/` and called with paths that have `/../` in them).
@@ -246,12 +246,13 @@ If you were already using an old version prior to RH Topic Tags v3.0.2, then the
 - The tag cloud was originally sorting as well as size-adjusting tags based on frequency of use, which basically robbed us of the ability to use the sorting order more sensibly; if tag size already indicates use level, then having tag order do the same thing is redundant and unhelpful. So the order has now been changed to human-friendly alphanumeric, consistent with the rest of the tag displays (in topics and in the ACP's default view).
 - Fixed misspelling of lead dev's name as "Robet" at every place that occurred.
 - Fixed copyright notices in file headers to use actual copyright symbol ©, instead of "(c)" which is actually (and always has been) legally meaningless nonsense. A valid copyright notice is of the form "Copyright YYYY CopyrightHolderName" or "© YYYY CopyrightHolderName" (while "Copyright © YYYY CopyrightHolderName" is redundant but not actually invalid). A string of "(c) YYYY CopyrightHolderName" is useless gibberish. Why anyone would try to use "(c)" I don't know; this is 2024 not 1984, and Unicode exists for a reason. This is GPL anyway, so it doesn't really matter much, but I'm a stickler for such things.
+- Fixed installation problem experienced by some users, by adjusting class call in `migrations/release_0_0_8.php` and a typo in `migrations/release_3_0_2.php`.
 
 ## Known issues and to-do list
 
-- Migrations files not completed yet; installing and testing this means disabling an old install and removing its files, then uploading/checking-out the current version, and re-enabling it, and purging board cache.
-- Someone on the phpBB forum reported that one or more earlier attempts at updating this extension (attempts on which the present code is partially based) did not work in phpBB 3.3.14 (currrent version as of 2024-12), but they did not provide any debugging information at all, so it's just unknown what the issue might be, or whether it's even an actual issue rather than someone's misconfiguration. No attempts to get this to work under 3.3.13 have been reported yet, only 3.3.5 through 3.3.12.
-- The tags created with this extension are not searchable by the built-in search function of phpBB or any known search extension. To search for uses of a tag, you have to go to `https://yoursite.com/tag/tagname` where `tagname` is the name of the tag in question, and as noted near the top of this page there are some simplistic search parameters. There is also no wildcard version of this, just a tag cloud. This means the tagging functionality is of sharply limited utility (especially if you have turned off the tag-cloud feature), so this is something to look into improving.
+- Migrations files throughly tested yet (in particular, we need to hear back from people upgrading to this version from Robert Heim's last GitHub version and phpBB.com forum-posted patches; this is best done on a development/testing server. Installing and testing this (safely, on a public/production site) means disabling an old install and removing its files, then uploading/checking-out the current version, and re-enabling it, and purging board cache. Purging board cache will be required no matter what.
+- Someone on the phpBB forum reported that one or more earlier attempts at updating this extension (attempts on which the present code is partially based) did not work in phpBB 3.3.14 (currrent version as of 2024-12), but they did not provide any debugging information at all, so it's just unknown what the issue might have been (thus whether or not it has been resolved), or whether it's even an actual issue rather than someone's misconfiguration. Attempts to get this to work under 3.3.14 have since been successful. No attempts to get this to work under 3.3.6 through 3.3.13.
+- The tags created with this extension are not searchable by the built-in search function of phpBB or any known search extension. To search for uses of a tag, you have to go to `https://yoursite.com/tag/tagname` where `tagname` is the name of the tag in question, and as noted near the top of this page there are some simplistic search parameters. There is also no wildcard version of this, just a tag cloud. This means the tagging functionality is of sharply limited utility (especially if you have turned off the tag-cloud feature), so this is something to look into improving.  Someone produced an extension that makes descriptions, from the Topic Descriptions extension, searchable in this way, so the approach used there can probably be adapted to tag searchability.
 - Going to `https://yoursite.com/tags/` does not work, only `https://yoursite.com/tags` with no trailing slash, but these URLs canonically should be treated as equivalent. There is a `https://yoursite.com/tags/suggest` page (loading a script that takes data from another, and is used by various functions), so `https://yoursite.com/tags/` does actually exist. Fixing this will have something to do with `controller/main.php`.
 - See `add-on-comma="false"` in `adm/style/topictags_blacklist.html`, `adm/style/topictags_whitelist.html`, `styles/all/template/event/posting_editor_subject_after.html`, ``, possibly in other places. May be possible to turn on ability of comma to serve same as Enter/Return in ending a tag, which is common/expected behavior, and makes sense since commas cannot be used in tags anyway.
 - There is a significant amount of code in here (e.g. in `service/tags_manager.php`) to support an option for case-sensitive tagging (or at least case-sensitive sorting and other display considerations regarding tagging; the full intent isn't clear yet). But there is no ACP option to enable such a thing, it's always defaulting to "false" or was even hard-coded that way in a few places (i.e. to be case-insensitive).
@@ -259,7 +260,8 @@ If you were already using an old version prior to RH Topic Tags v3.0.2, then the
 - In `service/tags_manager.php` there is a "Note: that $query needs to be at least 3 characters long", and code like `if (utf8_strlen($query) < 3)`; this may have to be changed entirely to properly support 2- and 1-character tags in every circumstance, though in testing so far they have been working fine anyway. Depends on exactly what circumstances this 3-char. constraint is being applied to. So far, it looks like this only affects `get_tag_suggestions()`.
 - Not an "issue", per se, but the original codebase seemed to be expecting 4 spaces per tab (in most cases, but was not entirely consistent in alignment). I've thus been using 4-per-tab for this project. It may look weird if you're set for 8-per-tab. phpBB's coding standards require 4, anyway.
 - RH used v2.1.1 of ngTagsInput and then custom tweaked it to work around a bug, and this extension has continued with RH's "v2.1.1-1" for years. But ngTagsInput is now at v3.2.0 and apparently has the underlying issue fixed, so the code should be reworked to use that version probably (and phpBB's extension coding standards say to use current versions of third-party libraries like this anyway). It's unclear at this point what (if anything) would break if v3.2.0 were just swapped in. Odds are that the syntax of how it is called would have to change in some way.
-- Another third party has forked RH Topic Tags, and released a non-free (paid) tagging extension. I have not attenpted to use it directly, but have examined its documentation and screenshots. It is clear that A) I have fixed things and introduced features that developer has not; B) that dev has added features and constraints that I have not; and C) our visions of how a tagging extension should operate are very, very different. (There are also more trivial differences, like the shape of the displayed tags.) In summary, that dev's version appears to be aligned with a tagging model in which admins/mods apply a fixed set of tags to topics, then use drag-and-drop to priority-organize them on a per-topic basis, with tags not being otherwise sorted in such a display at all (probably just raw database order, i.e. creation date, by default). My version is geared for much more public tagging, applies alphanumeric sorting automatically, and has no concept of tags being priority-sortable on a per-topic basis (a subjective determination only a admin/mod or other topic "controller" could make). So, my version is suited for boards where tags are used the way they are on a social-media site, and indeed on most web-boards. The other person's version is geared to highly "curated" tagging by dedicated staff not by general-public users of the board.
-- A feature I want to add is a new permission to edit a the first post in a topic (the one to which tags are attached) and only be able to change the tags and other post metadata (title and, if the extension for that is installed, topic description) without being able to touch the content of the post (unless able to do so already by being the original post author or by being an admin/moderator). This would great expand the utility of RH Topic Tags by making tagging a community-managed affair, instead of only something adjustable by a tiny number of overworked invidivuals.
+- Another third party has forked RH Topic Tags, and released a non-free (paid) tagging extension. I have not attenpted to use it directly, but have examined its documentation and screenshots. It is clear that A) I have fixed things and introduced features that developer has not; B) that dev has added features and constraints that I have not; and C) our visions of how a tagging extension should operate are very, very different. (There are also more trivial differences, like the shape of the displayed tags.) In summary, that dev's version appears to be aligned with a tagging model in which admins/mods apply a fixed set of tags to topics, then use drag-and-drop to priority-organize them on a per-topic basis, with tags not being otherwise sorted in such a display at all (probably just raw database order, i.e. creation date, by default). My version is geared for much more public tagging, applies alphanumeric sorting automatically, and has no concept of tags being priority-sortable on a per-topic basis (a subjective determination only a admin/mod or other topic "controller" could make). So, my version is suited for boards where tags are used the way they are on a social-media site, and indeed on most web-boards - as a user-level function. The other person's version is geared to highly "curated" tagging by dedicated admin/mod staff, not by general-public users of the board.
+- A feature I want to add is a new permission to edit the first post in a topic (the one to which tags are attached) and only be able to change the tags and other post metadata (title and, if the extension for that is installed, topic description) without being able to touch the content of the post (unless able to do so already by being the original post author or by being an admin/moderator). This would great expand the utility of RH Topic Tags by making tagging a community-managed affair, instead of only something adjustable by a tiny number of overworked invidivuals.
 - Another new planned feature is tag descriptions, managable in the ACP, and producing a `https://yoursite.com/taglist` page, and perhaps a mouse-hover tooltip that describes the tag. This will take some significant work to implement.
 - The human-friendly numeric sorting of tagnames is presently one-pass only, and needs to be recursive to handle tags with multiple numeric string groups (e.g. "Project03-Ver13.7", etc.).
+- Various additional features have been requested, and will be considered after the above are resolved. Some of these include: compatibilty/integration with the Precise Similar Topics extension; compatibilty/integration with the Topic Prefixes extension; an option to display number of views of topics for a particular tag; and ability to subscribe to tags (without affecting manually subscribed-to topics).
