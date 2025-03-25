@@ -33,7 +33,7 @@ class release_3_0_2 extends \phpbb\db\migration\migration
 		$re = array();
 
 		$re[] = array('config.remove', array(prefixes::CONFIG.'_convert_space_to_minus', 1));
-		$re[] = array('config.add', array(prefixes::CONFIG.'_convert_space_to_hyphen'));
+		$re[] = array('config.add', array(prefixes::CONFIG.'_convert_space_to_hyphen', 1));
 		$re[] = array('config.update', array(prefixes::CONFIG.'_version', $this->version));
 
 		return $re;
